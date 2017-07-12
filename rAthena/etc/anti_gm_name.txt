@@ -1,0 +1,12 @@
+-	script	anti_gm_name	-1,{
+OnPCLoginEvent:
+	getmapxy(.@map$,.@x,.@y,0);
+	if(.@map$ != "sec_pri" && getgmlevel() == 0) {
+	setarray .filter$[0],"Admin","Game Master","[GM]","[GM] "," [GM]","GM.",".GM"," GM "," GM","skyro","sky ro","sky ro "," sky ro"," sky ro "," skyro"," skyro ","skyro ","GameMaster","GM ";
+	for( set @i , 0 ; @i < getarraysize ( .filter$ ) ; set @i , @i + 1 )
+		if(compare(strcharinfo(0),.filter$[ @i ])){
+			atcommand "@jail "+strcharinfo(0);
+			end;
+			}
+	}
+}

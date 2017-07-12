@@ -1,0 +1,22 @@
+prontera,125,125,4	script	VIP Sizer::sadersize	625,{
+	mes "[VIP Sizer]";
+	mes "Do you want Change your size ?";
+	mes "for 50000 zeny";
+	next;
+	switch(select(""+ ( "Yes" )+":"+("Not now" )+"")){
+	Case 1:
+		mes "[VIP Sizer]";
+		mes "1 2 3 4 5 6 7 8 9";
+		mes "Thank you.";
+			if( Zeny < 50000 ) {
+			mes "You need 50000 zeny.";
+			close;
+		}
+	input .number$;
+	atcommand "@size "+.number$;
+	set Zeny,Zeny - 50000;
+	close;
+	Case 2:
+	Close;
+	}
+}

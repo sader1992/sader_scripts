@@ -1,0 +1,65 @@
+halloween,0,0,0,0	monster	Banshee Master	1974,50,0,0,0
+halloween,0,0,0,0	monster	Ragged Zombie	1865,50,0,0,0
+halloween,0,0,0,0	monster	Flame Skull	1869,50,0,0,0
+halloween,0,0,0,0	monster	Giant Whisper	1186,20,0,0,0
+halloween,0,0,0,0	monster	Marionette	1143,50,0,0,0
+halloween,0,0,0,0	monster	Nightmare	1061,50,0,0,0
+halloween,0,0,0,0	monster	Whisper	1179,50,0,0,0
+halloween,0,0,0,0	monster	Banshee	1867,50,0,0,0
+halloween,0,0,0,0	monster	Bloody Murderer	1507,10,0,0,0
+halloween,0,0,0,0	monster	Deviruchi	1109,50,0,0,0
+halloween,0,0,0,0	monster	Gibbet	1503,50,0,0,0
+halloween,0,0,0,0	monster	Hell Poodle	1866,10,0,0,0
+halloween,0,0,0,0	monster	Hylozoist	1510,50,0,0,0
+halloween,0,0,0,0	monster	Incubus	1374,30,0,0,0
+halloween,0,0,0,0	monster	Injustice	1257,10,0,0,0
+
+
+halloween,0,0,0,0	monster	Pumpkin	2368,100,0,0,0	
+halloween,0,0,0,0	monster	Black Ghost	2369,50,0,0,0
+halloween,0,0,0,0	monster	White Ghost	2370,50,0,0,0
+
+
+halloween,0,0,0,0	boss_monster	Halloween King	2367,1,21600000,600000,1
+halloween,0,0,0,0	boss_monster	Poring King	2371,1,21600000,600000,1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//Banshee Master   (BANSHEE_MASTER)   Mob-ID#1974
+//Bangungot Manananggal (Re-Stats)   (MD_MANANANGGAL)   Mob-ID#2338
+//Pouring   (POURING)   Mob-ID#1894
+//Dandelion   (DANDELION_H)   Mob-ID#2031
+//Flame Skull   (FLAME_SKULL)   Mob-ID#1869
+//Giant Whisper   (WHISPER_BOSS)   Mob-ID#1186
+//Marionette   (MARIONETTE)   Mob-ID#1143
+//Nightmare   (NIGHTMARE)   Mob-ID#1061
+//Whisper   (WHISPER)   Mob-ID#1179
+//Banshee   (BANSHEE)   Mob-ID#1867
+//Bathory   (BATHORY)   Mob-ID#1102
+//Bloody Murderer   (BLOODY_MURDERER)   Mob-ID#1507
+//Deviruchi   (DEVIRUCHI_H)   Mob-ID#1928
+//Gibbet   (GIBBET)   Mob-ID#1503
+
+//Hell Poodle   (HELL_POODLE)   Mob-ID#1866
+//Hylozoist / Heirozoist   (HYLOZOIST)   Mob-ID#1510
+//Incubus   (INCUBUS)   Mob-ID#1374
+//Incubus   (G_INCUBUS)   Mob-ID#1580
+
+//Injustice   (G_INJUSTICE)   Mob-ID#1446
+//Injustice   (INJUSTICE)   Mob-ID#1257

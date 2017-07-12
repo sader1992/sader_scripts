@@ -1,0 +1,7 @@
+prontera,146,67,6	script	Halter Remover	612,{
+	if(ismounting() == 1) setmounting(); 
+	OnInit:{
+		waitingroom "[ Halter Remover ]",0;
+	end;
+	}
+}

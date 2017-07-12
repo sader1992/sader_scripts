@@ -1,0 +1,35 @@
+halloween,246,469,0	warp	halloween500	1,1,prontera,155,89
+prontera,156,118,4	script	Queen of Hell#halloween1	856,{
+if (#language == 1){
+	mes "[Queen of Hell]";
+	mes "finaly I have my new palace finished";
+	mes "and it's this time of the year ...";
+	mes "so I will open a path to hell for you humans to see it .";
+	next;
+	mes "[Queen of Hell]";
+	mes "Do you want to go to hell ?";
+	}else{
+	mes "[Queen of Hell]";
+	mes "Ê «ŒÌ—« «‰ ÂÌ  „‰ ﬁ’—Ì «·ÃœÌœ";
+	mes "... Ê ·«‰Â Â–« «·Êﬁ  „‰ «·”‰…";
+	mes ". ”√› Õ «·ÿ—Ìﬁ ··ÃÕÌ„ ·ﬂ„ «ÌÂ« «·»‘— · —Ê«";
+	next;
+	mes "[Queen of Hell]";
+	mes "Â·  —Ìœ «·–Â«» ··ÃÕÌ„ ø";
+	}
+	next;
+	switch(select(""+ ( (#language == 1)?"Yes , let's go to hell !":"! «·ÃÕÌ„ ø »«· √ﬂÌœ" )  +":"+( (#language == 1)?"Oh hell Noo !":"... =.= «·ÃÕÌ„ ø ·« ‘ﬂ—«˝" )+"")){
+	Case 1:
+	warp "halloween",247,460;
+	Case 2:
+	Close;
+	}
+}
+
+prontera,159,117,3	script	Guard#halloween2	667,{
+}
+//738
+//2342
+prontera,153,117,5	script	Guard#halloween3	685,{
+}
+
