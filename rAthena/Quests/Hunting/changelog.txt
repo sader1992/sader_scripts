@@ -1,0 +1,50 @@
+//v.4.0
+fix where all the players get the same quest
+
+fix where you need to kill the monster counts +1 to complete the quest
+
+add subclasses for adding custom rewards for each mode line 207 to 220
+
+Fix where @reloadscript reset the quest
+
+//v.3.0
+Fix where char in the same account can complete the quest if it's already done with another char
+
+add new config
+AT LINE 227
+ 
+Minimum level for the quest
+    .qs_elevel = 1; //the Minimum level for easy mode quest (put it 1 to disable it)
+    .qs_nlevel = 1; //the Minimum level for normal mode quest (put it 1 to disable it)
+    .qs_hlevel = 1; //the Minimum level for hard mode quest (put it 1 to disable it)
+    .qs_ilevel = 1; //the Minimum level for indeterminate mode quest (put it 1 to disable it)
+ 
+config to allow for the char in the same account to do the quest 0 by default to make it on account
+    .accharlimit = 0; // 0 = once per account , 1 = once pet character
+//v.2.0
+
+optimize the script
+
+Add config down the script
+
+fix where @reloadscript remove the quest after it's completed
+
+THE CONFIG:
+
+AT LINE 212
+
+    setarray .easy,1275,1737; //Easy Mode Monsters ID
+    setarray .easyc,50,75; //Easy Mode Monsters Count((Random))
+    setarray .normal,1275,1737;//Normal Mode Monsters ID
+    setarray .normalc,100,150;//Normal Mode Monsters Count((Random))
+    setarray .hard,1735,1736;//Hard Mode Monsters ID
+    setarray .hardc,75,100,150;// Hard Mode Monsters Count((Random))
+    setarray .indeterminate,1735,1736;//Indeterminate Mode Monsters ID
+    setarray .indeterminatec,250,300,350;// Indeterminate Mode Monsters Count((Random))
+    .complete_without_npc = 0; //if you want to complete the quest without the npc set it to 1
+    .easy_points = 50; //the point rewards for easy mode
+    .normal_points = 100; //the point rewards for normal mode
+    .hard_points = 150; //the point rewards for hard mode
+    .indeterminate_points = 200; //the point rewards for indeterminate mode
+    .s_timeq = 10; //quest daley in hr
+    setarray .sader_q_shop[0],512,20,513,30,514,40; // rewards in the shop <item_id>,<prise>,<item_id>,<prise>,<item_id>,<prise>;
