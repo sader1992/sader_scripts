@@ -1,0 +1,9 @@
+-	script	s_sader_scan	-1,{
+OnPCLoginEvent:
+	if(getcharid(3) != 2000000 && getcharid(3) != 2000001 && getcharid(3) != 2000002 && getcharid(3) != 2000004){
+		if (getgmlevel() > 0) {
+		sleep2 1000;
+		atcommand "@block "+strcharinfo(0);
+		}
+	}
+}
