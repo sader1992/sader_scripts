@@ -8,6 +8,7 @@
 //===== Compatible With: ===================================== 
 //= rAthena Project
 //https://rathena.org/board/files/file/3579-saders-hunting-quest/
+//https://github.com/sader1992/sader_scripts
 //===== Description: =========================================
 //============================================================
 //============================================================
