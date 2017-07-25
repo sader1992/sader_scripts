@@ -278,7 +278,7 @@ OnInit:
 	////v3.0 update
 	.accharlimit = 0;	// 0 = once per account , 1 = once pet character
 	////v4.1 update
-	.shopEnabled = 0;	// 0 = Disable shop , 1 = Enable shop
+	.shopEnabled = 1;	// 0 = Disable shop , 1 = Enable shop
 	////v4.2 update
 	setarray .qs_elevel,1,175;	//the Minimum level and the Maximum level for easy mode quest (minimum,maximum)
 	setarray .qs_nlevel,1,175;	//the Minimum level and the Maximum level for normal mode quest (minimum,maximum)
