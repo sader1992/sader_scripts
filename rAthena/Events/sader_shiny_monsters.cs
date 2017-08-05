@@ -20,9 +20,10 @@ for (.@i = 0; .@i < getarraysize(.s_shiny); .@i ++){
 		if(monster_shiny_count[.@i] < .s_shiny_amount[.@i]){
 			monster_shiny_count[.@i]++;
 			dispbottom "You killed "+ monster_shiny_count[.@i]+" "+ strmobinfo( 1,.s_shiny[.@i]) +".";
-		}else{
-			announce "the shiny monster" + .s_shiny[.@i] + "spowned" ,bc_self,0xFFFFFF, 0x190, 15;
-			set monster_shiny_count[.@i],0;
+			if(monster_shiny_count[.@i] >= .s_shiny_amount[.@i]){
+				announce "the shiny monster " + strmobinfo( 1,.s_shiny[.@i]) + " spowned" ,bc_self,0xFFFFFF, 0x190, 15;
+				set monster_shiny_count[.@i],0;
+		}
 		}
 	}
 }
