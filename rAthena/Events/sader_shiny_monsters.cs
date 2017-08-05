@@ -4,7 +4,7 @@
 //= Sader1992
 //https://rathena.org/board/profile/30766-sader1992/
 //===== Current Version: =====================================
-//= 1.0
+//= 0.0
 //===== Compatible With: ===================================== 
 //= rAthena Project
 //https://rathena.org/board/  not submited yet
