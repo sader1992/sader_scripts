@@ -7,7 +7,7 @@
 //= 1.0
 //===== Compatible With: ===================================== 
 //= rAthena Project
-//https://rathena.org/board/files/file/ (this the first version there is no url yet)
+//https://rathena.org/board/files/file/3647-saders-hourly-rewards/
 //https://github.com/sader1992/sader_scripts
 //===== Description: =========================================
 //==== all the configuration are in the last
