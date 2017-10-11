@@ -4,7 +4,7 @@
 //= Sader1992
 //https://rathena.org/board/profile/30766-sader1992/
 //===== Current Version: =====================================
-//= 1.0
+//= 1.1
 //===== Compatible With: ===================================== 
 //= rAthena Project
 //https://rathena.org/board/files/file/3647-saders-hourly-rewards/
@@ -26,6 +26,7 @@
 //==== if you like my work maybe consider support me at paypal
 //==== sader1992@gmail.com
 //============================================================
+//==== 1.1 FIX Critical issue with gepard/ip and compatibility with my other scripts
 //============================================================
 -	script	sader_Hourly_Rewards	-1,{
 
@@ -79,7 +80,7 @@ OnHourlyRewards:
 			if(.@s_GePard == 0){
 				query_logsql("INSERT INTO `sader_variables_log` (`unique_id`,`ip`,`variable`,`index`,`value`, `account_id`, `char_id`, `char_name`) VALUES ('"+.@s_last_unique_id+"', '"+getcharip()+"', '#Hourly_Rewads_Check', '0', '"+#Hourly_Rewads_Check+"', '"+getcharid(3)+"', '"+getcharid(0)+"', '"+strcharinfo(0)+"')");
 			}
-			query_logsql("Update `sader_variables_log` SET `value` = '"+#Hourly_Rewads_Check+"' WHERE `account_id`= '"+getcharid(3)+"'");
+			query_logsql("Update `sader_variables_log` SET `value` = '"+#Hourly_Rewads_Check+"' WHERE `unique_id`= '"+.@s_last_unique_id+"' AND `variable` = '#Hourly_Rewads_Check'");
 		}else if(.s_GePard_ip == 2){
 			query_logsql("SELECT value FROM `sader_variables_log` WHERE ip = '"+getcharip()+"' AND `variable` = '#Hourly_Rewads_Check'", .@s_ip);
 			if(.@s_ip >= #Hourly_Rewads_Check){
@@ -91,7 +92,7 @@ OnHourlyRewards:
 			if(.@s_ip == 0){
 				query_logsql("INSERT INTO `sader_variables_log` (`unique_id`,`ip`,`variable`,`index`,`value`, `account_id`, `char_id`, `char_name`) VALUES ('"+.@s_last_unique_id+"', '"+getcharip()+"', '#Hourly_Rewads_Check', '0', '"+#Hourly_Rewads_Check+"', '"+getcharid(3)+"', '"+getcharid(0)+"', '"+strcharinfo(0)+"')");
 			}
-			query_logsql("Update `sader_variables_log` SET `value` = '"+#Hourly_Rewads_Check+"' WHERE `account_id`= '"+getcharid(3)+"'");
+			query_logsql("Update `sader_variables_log` SET `value` = '"+#Hourly_Rewads_Check+"' WHERE `ip`= '"+getcharip()+"' AND `variable` = '#Hourly_Rewads_Check'");
 		}
 		message strcharinfo(0),"[Hourly Rewards]: you Gain your Reward.";
 		callsub Hourly_Rewads;
