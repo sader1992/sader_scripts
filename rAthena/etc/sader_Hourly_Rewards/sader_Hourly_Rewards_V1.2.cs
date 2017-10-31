@@ -129,6 +129,10 @@ OnPCLoginEvent:
 	addtimer .s_time, strnpcinfo(3)+"::OnHourlyRewards";
 end;
 
+OnMyHourlyPoints:
+	message strcharinfo(0),"[Hourly Rewards]: You have " + #HourlyRewards + " Hourly Points .";
+end;
+
 OnInit:
 	.s_idle = 0; //	ban hourly rewards from idle players ? 0 no / 1 yes {if player didn't move for x time he wont get hourly reward}  , DEFAULT = 0
 	.s_idle_time = 1800; //	this the time for idle in secend  , DEFAULT = 1800 (30 min)
@@ -140,6 +144,8 @@ OnInit:
 	query_logsql("CREATE TABLE IF NOT EXISTS `sader_variables_log` (`unique_id` INT( 11 ) UNSIGNED NOT NULL DEFAULT  '0',`ip` VARCHAR(100) NOT NULL,`variable` VARCHAR(32) NOT NULL, `index` INT NOT NULL, `value` INT NOT NULL,`account_id` INT NOT NULL,`char_id` INT NOT NULL,`char_name` VARCHAR(30) NOT NULL) ENGINE=MyISAM");
 	bindatcmd("UnHourlyBan",strnpcinfo(3)+"::OnUnHourlyBan",99,99);
 	bindatcmd("HourlyBan",strnpcinfo(3)+"::OnHourlyBan",0,99);
+	bindatcmd("MyHourlyPoints",strnpcinfo(3)+"::OnMyHourlyPoints",0,99);
+	bindatcmd("MHP",strnpcinfo(3)+"::OnMyHourlyPoints",0,99);
 end;
 
 Hourly_Rewads:
