@@ -79,7 +79,7 @@ prontera,155,186,3	script	Mini Endless Tower	406,{
 					instance_destroy;
 				close;
 			case 4:
-				query_sql("SELECT `last_unique_id` FROM `login` WHERE `char_id` = '"+getcharid(3)+"'", .@last_unique_id$);
+				query_sql("SELECT `last_unique_id` FROM `login` WHERE `account_id` = '"+getcharid(3)+"'", .@last_unique_id$);
 				query_sql("delete from `MiniEtower` where `unique_id` = '"+.@last_unique_id$+"'");
 				close;
 		}
@@ -140,7 +140,7 @@ L_Enter:
 		close;
 	}
 	if(.gepard){
-		query_sql("SELECT `last_unique_id` FROM `login` WHERE `char_id` = '"+getcharid(3)+"'", .@last_unique_id$);
+		query_sql("SELECT `last_unique_id` FROM `login` WHERE `account_id` = '"+getcharid(3)+"'", .@last_unique_id$);
 		query_sql("SELECT `time`,`char_id` FROM `MiniEtower` WHERE `unique_id` = '"+.@last_unique_id$+"'", .@gptime ,.@charid);
 		.@all_time = (.@gptime - gettimetick(2));
 		if(.@all_time > 0 && .@charid != getcharid(1) ){
