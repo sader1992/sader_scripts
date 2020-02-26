@@ -73,6 +73,7 @@ S_ClaimReward:
 				.@checkp += 8;
 			}
 		}else{
+			.@s_last_unique_id$ = "0";
 			.@checkp += 8;
 		}
 		if(.@checkp & 1 && .@checkp & 2 && .@checkp & 4 && .@checkp & 8){
