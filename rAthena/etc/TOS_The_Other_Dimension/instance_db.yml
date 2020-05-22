@@ -1,0 +1,8 @@
+  - Id: 50
+    Name: The Other Dimension
+    TimeLimit: 1230
+    IdleTimeOut: 1
+    Enter:
+      Map: 2@ods
+      X: 23
+      Y: 14

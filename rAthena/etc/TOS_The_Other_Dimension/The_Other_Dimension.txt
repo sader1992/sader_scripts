@@ -1,0 +1,342 @@
+//===== rAthena Script =======================================
+//= The Other Dimension from Tree Of Savior!
+//===== By: ==================================================
+//= Sader1992
+//= Free!!
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//https://github.com/sader1992/sader_scripts
+//===== Description: =========================================
+//==== REEEEEEEEEEEEEEEEEEEEEEAD MEEEEEEEEEEEEEEEEEE!
+//==== READ ME!
+//==== if you play Tree Of Savior , you might know The Other Dimension.
+//==== The main idea is the player can join The Other Dimension it's a solo instance
+//==== he can join as much as he want , the Goal is to reach the Highest Stage impossible in 20 min or until he die!
+//==== in Tree Of Savior The Other Dimension is one stage monsters and the 2nd stage boss
+//==== endless (i didn't finish it before but the idea is to not finish it!)
+//==== The rewards are sent to the mail at the end of the week
+//==== see the config to edit it (search for OnInit)
+//==== in Tree Of Savior the rewards are coints that you get each week
+//==== you can do that and activate the shop option
+//==== there is 1 array for the items id and 2 array for the counts
+//==== the first count array is for any Participant
+//==== the other count array is if the player was the first in his class and the Participants from his class is more than .MiniParticipants
+//==== you can block classes , or even make the monsters per class (Check Add for more info)
+//==== there is a rank option to check the players's max stage per classes
+//==== there is no drop nor expin the system!
+//==== i Added 40 stage for testing and as example for you , just remove it all and build your own!
+//==== the stages i added has no balance! add it to what best for your server.
+//==== i suggest making +100 stage , make sure that no player can reach the final stage but
+//==== make it really hard not impossible!!
+//============================================================
+//==== please report any error you find
+//============================================================
+//============================================================
+prontera,155,188,4	script	The Other Dimension	10307,{
+	switch(select("Enter The Other Dimension:Shop:Rank:Information")){
+		case 1:
+			if(.AllowedClasses != -1){
+				if(inarray(.AllowedClasses,Class) == -1){
+					mes "Sorry, Your Class is not Allowed in the Other Dimension";
+					end;
+				}
+			}
+			if(getcharid(1)){
+				mes "You Have To Leave Your Party!";
+				end;
+			}
+			if(instance_id(IM_CHAR))
+				instance_destroy instance_id(IM_CHAR);
+			if (instance_create(.in_name$,IM_CHAR,getcharid(0)) < 0) {
+				mes "^0000ff" + .in_name$ + " ^000000- Reservation Failed!";
+				close;
+			}
+			.@id = instance_id(IM_CHAR);
+			switch(instance_enter(.in_name$,-1,-1,getcharid(0),.@id)) {
+			case IE_OTHER:
+				mes "An unknown error has occurred.";
+				close;
+			case IE_NOINSTANCE:
+				mes "The memorial dungeon " + .in_name$ + " does not exist.";
+				close;
+			case IE_OK:
+				showdigit 1230,2;
+				InOtherDimensionDigit = true;
+				mapannounce strnpcinfo(4), strcharinfo(0) +" is entering the dungeon, " + .in_name$ + ".",bc_map,"0x00ff99",FW_NORMAL,12;
+			}
+			end;
+		case 2:
+			//Open Point Shop.
+			mes "Disabled For now";
+			end;
+		case 3:
+			query_sql("SELECT `class` FROM `" + .sql_t$ + "`",.@classes);
+			if(!getarraysize(.@classes)){
+				mes "no one has entered yet!";
+				end;
+			}
+			for(.@i=0;.@i<getarraysize(.@classes);.@i++){
+				if(inarray(.@c_list,.@classes[.@i]) == -1)
+					.@c_list[getarraysize(.@c_list)] = .@classes[.@i];
+			}
+			for(.@i=0;.@i<getarraysize(.@c_list);.@i++){
+				.@op$ += jobname(.@c_list[.@i]) + ":";
+			}
+			.@s = select(.@op$) -1;
+			query_sql("SELECT `name`,`max_round` FROM `" + .sql_t$ + "` WHERE `class` = '" + .@c_list[.@s] + "' AND `max_round` > '0' ORDER BY `max_round` DESC",.@name$,.@max_round);
+			if(!getarraysize(.@name$)){
+				mes "no one has entered yet!";
+				end;
+			}
+			for(.@i=0;.@i<getarraysize(.@name$);.@i++){
+				mes "^3702fe" + (.@i + 1) + "^000000. '^09AB36" + .@name$[.@i] + "^000000' ^ADA049 Round " + .@max_round[.@i] + "^000000";
+			}
+			end;
+		case 4:
+			mes "You can join The Other Dimension as much as you want";
+			mes "The goal is to reach the highest stage as possible";
+			mes "You have 20min or until you die";
+			mes "Rewards are sent automaticly in the mail every week";
+			mes "Taming a monster does not count towards defeating them, and it will break your run!";
+			mes "there is No Drops and No Exp from the monsters!";
+			end;
+	}
+
+OnForceSndOD:
+	mes "all the rewards will be sent and the rank will be cleared!";
+	mes "Are you sure you want to do that!!";
+	if(select("no:no:yes:no") != 3)
+		end;
+OnFriday0001: //send the rewards.
+	query_sql("SELECT `class` FROM `" + .sql_t$ + "`",.@classes);
+	for(.@i=0;.@i<getarraysize(.@classes);.@i++){
+		if(inarray(.@c_list,.@classes[.@i]) == -1 && inarray(.FirstClasses,.@classes[.@i]) != -1)
+			.@c_list[getarraysize(.@c_list)] = .@classes[.@i];
+	}
+	for(.@i=0;.@i<getarraysize(.@c_list);.@i++){
+		query_sql("SELECT `char_id` FROM `" + .sql_t$ + "` WHERE `class` = '" + .@c_list[.@i] + "' `max_round` > '10' ORDER BY `max_round` DESC",.@cid);
+		if(getarraysize(.@cid) > .MiniParticipants)
+			.@FirstPlayrs[getarraysize(.@FirstPlayrs)] = .@cid[0];
+	}
+
+	query_sql("SELECT `char_id`,`max_round` FROM `" + .sql_t$ + "` WHERE `max_round` > '10' ORDER BY `max_round` DESC",.@cid1,.@max1);
+	if(.MaxRewardPerClass == -1) .@s = getarraysize(.@cid1); else .@s = .MaxRewardPerClass;
+	for(.@i=0;.@i<.@s;.@i++){
+		if(inarray(.@FirstPlayrs,.@cid1) != -1){
+			mail .@cid1[.@i], .sender$, .title$, .body$, 0, .rewardID, .rewardCN, .@null, .@null, .@null, .@null, .@null;
+		}else{
+			mail .@cid1[.@i], .sender$, .title$, .body$, 0, .rewardID, .rewardCN, .@null, .@null, .@null, .@null, .@null;
+		}
+	}
+	
+	query_sql("TRUNCATE `" + .sql_t$ + "`"); //clear the sql.
+end;
+OnForceClearOD:
+	mes "rank will be cleared! without sending any rewards.";
+	mes "Are you sure you want to do that!!";
+	if(select("no:no:yes:no") != 3)
+		end;
+	query_sql("TRUNCATE `" + .sql_t$ + "`"); //clear the sql.
+end;
+OnPCLoginEvent:
+	if(InOtherDimensionDigit){
+		InOtherDimensionDigit = false;
+		showdigit 0,3;
+	}
+end;
+OnInit: //Main Config
+	//if the first element was -1 all the classes is allowed.
+	//if it's not -1 , put the classes ids for the allwed classes.
+	setarray .AllowedClasses,-1;
+	
+	//The Rewards.
+	setarray .rewardID,503,502;//Array of the item ids.the max is how much the mail can handle! stay 5 for safty , too lazy to check!
+	setarray .rewardCN,1,1;//(PER STAGE!) Array of the item counts!.
+	setarray .rewardFT,5,2;//(PER STAGE!) Array of the item counts! For Who was the first on his class and the Participants in the same class was more than .MiniParticipants.
+	.MiniParticipants = 5;//IF YOU READ EVERYTHING YOU WILL KNOW WHAT IS THIS!!.
+	setarray .FirstClasses,-1;// if it is -1 than all the first players of the classes (with more than .MiniParticipants Participants) will get the rewardFT count , if not -1 put array of the classes.
+	.MaxRewardPerClass = -1;//how many player will resive the reward per class the default is -1 all the Participants will get the rewards.
+	
+	/*
+	FOR EXAMPLE WITH THE DEFAULT OPTIONS:
+	if a player cleard up to stage 6 , he will get at the end of the week the count*stage 1*6 6 from the item id 503 and 6 from 502.
+	
+	if the player was the first in his class and there was more than .MiniParticipants from that class in the rank
+	if a player cleard up to stage 6 , he will get at the end of the week the count*stage 5*6 30 from the item id 503 and 12 from 502.
+	
+	all the items will be sent via the Mail System
+	
+	IF YOU DIDN'T UNDERSTAND RE-READ.
+	*/
+	
+	//Message Information:
+	.sender$ = "Server";
+	.title$ = "The Other Dimension Rewards";
+	.body$ = "The Reward for Participating in\r\nThe Other Dimension.";
+	
+	.in_name$ = "The Other Dimension";
+	.sql_t$ = "other_dimension_instance";//do not change if you don't know what you are doing!
+	bindatcmd "ForceSndOD",strnpcinfo(3) + "::OnForceSndOD",99,99;
+	bindatcmd "ForceClearOD",strnpcinfo(3) + "::OnForceClearOD",99,99;
+end;
+}
+
+2@ods	mapflag	noteleport
+2@ods	mapflag	nomemo
+2@ods	mapflag	notrade
+2@ods	mapflag	nodrop
+2@ods	mapflag	noloot
+2@ods	mapflag	noexp
+2@ods	mapflag	nopenalty
+2@ods	mapflag	nochat
+2@ods	mapflag	novending
+2@ods	mapflag	nobranch
+2@ods	mapflag	hidemobhpbar
+2@ods,0,0,0	script	::OtherDimensionSolo	-1,{
+OnInit: //Monsters Config
+	function Add;
+	freeloop(1);
+	//Add(<Class>,<Stage id>,<mob id>,<mob count>{,<mob id>,<mob count>{,<mob id>,<mob count>}});
+	// if Class is -1 than it will aplly to all the classes that does not have custom mobs.
+	Add(-1,1,1015,10,1077,10,1054,10,1033,10);
+	Add(-1,2,1086,1);//Golden Thief Bug   (GOLDEN_BUG)   Mob-ID#1086
+	Add(-1,3,1686,10,1023,10,1273,10,2722,10,1439,10,1473,10);
+	Add(-1,4,1159,1);//Phreeoni   (PHREEONI)   Mob-ID#1159
+	Add(-1,5,1584,10,1500,10,1195,10,1154,10);
+	Add(-1,6,1511,1);//Amon Ra   (AMON_RA)   Mob-ID#1511
+	Add(-1,7,1441,10,1321,10,1621,10,1444,10,2890,10);
+	Add(-1,8,1150,1);//Moonlight Flower   (MOONLIGHT)   Mob-ID#1150
+	Add(-1,9,1117,10,1192,10,1517,10,1102,10,1884,10);
+	Add(-1,10,1389,1);//Dracula   (DRACULA)   Mob-ID#1389
+	Add(-1,11,1620,10,1193,10,2694,10,1155,10,2006,10);
+	Add(-1,12,1688,1);//Lady Tanee   (LADY_TANEE)   Mob-ID#1688
+	Add(-1,13,1131,10,1306,10,2660,10,1882,10,2071,10,1715,10);
+	Add(-1,14,1087,1);//Orc Hero   (ORK_HERO)   Mob-ID#1087
+	Add(-1,15,1290,10,2829,10,1512,10,1408,10,1072,10,2419,10);
+	Add(-1,16,1059,1);//Mistress   (MISTRESS)   Mob-ID#1059
+	Add(-1,17,1883,10,1143,10,2722,10,1622,10,1377,10,1794,10);
+	Add(-1,18,1147,1);//Maya   (MAYA)   Mob-ID#1147
+	Add(-1,19,1617,10,1600,10,2326,10,1403,10,2155,10);
+	Add(-1,20,1046,1);//Doppelganger   (DOPPELGANGER)   Mob-ID#1046
+	Add(-1,21,1294,10,1364,10,1383,10,1257,10,1367,10);
+	Add(-1,22,1038,1);//Osiris   (OSIRIS)   Mob-ID#1038
+	Add(-1,23,1318,10,1412,10,1366,10,1416,10,1375,10);
+	Add(-1,24,1157,1);//Pharaoh   (PHARAOH)   Mob-ID#1157
+	Add(-1,25,1201,10,1387,10,1253,10,1410,10);
+	Add(-1,26,1190,1);//Orc Lord   (ORC_LORD)   Mob-ID#1190
+	Add(-1,27,2048,10,1298,10,1109,10,1315,10);
+	Add(-1,28,1373,1);//Lord of Death / Lord of the Dead   (LORD_OF_DEATH)   Mob-ID#1373
+	Add(-1,29,1135,10,2668,10,1680,10,1134,10);
+	Add(-1,30,2131,1);//Lost Dragon   (LOST_DRAGON)   Mob-ID#2131
+	Add(-1,31,1196,10,1267,10,1106,10,2747,10);
+	Add(-1,32,1251,1);//Knight of Windstorm / Stormy Knight   (KNIGHT_OF_WINDSTORM)   Mob-ID#1251
+	Add(-1,33,2748,10,1255,10,2753,10,3737,10);
+	Add(-1,34,1039,1);//Baphomet   (BAPHOMET)   Mob-ID#1039
+	Add(-1,35,1385,10,1515,10,1194,10,1291,10);
+	Add(-1,36,1630,1);//Bacsojin / White Lady   (BACSOJIN_)   Mob-ID#1630
+	Add(-1,37,1148,10,1615,10,1975,10,1207,10);
+	Add(-1,38,1112,1);//Drake   (DRAKE)   Mob-ID#1112
+	Add(-1,39,1405,10,2724,10,1133,10,1382,10);
+	Add(-1,40,1492,1);//Incantation Samurai / Samurai Specter   (INCANTATION_SAMURAI)   Mob-ID#1492
+
+	freeloop(0);
+	.sql_t$ = "other_dimension_instance";//do not change if you don't know what you are doing
+	query_sql("CREATE TABLE IF NOT EXISTS `" + .sql_t$ + "` (`char_id` INT NOT NULL,`name` VARCHAR(32) NOT NULL,`class` INT NOT NULL,`max_round` INT NOT NULL DEFAULT '0', UNIQUE (char_id)) ENGINE=MyISAM");
+end;
+OnInstanceInit:
+	initnpctimer;
+	startnpctimer;
+	'i_id = instance_id();
+	'map$ = instance_mapname(strnpcinfo(4),'i_id);
+	'npc$ = instance_npcname(strnpcinfo(3),'i_id);
+	'owner = instance_live_info(ILI_OWNER,'i_id);
+	'owner_name$ = convertpcinfo('owner,CPC_NAME);
+	'sd = convertpcinfo('owner,CPC_ACCOUNT);
+	'class = readparam(Class,'owner);
+	if(getd(".max_round" + 'class)){
+		'max_round = getd(".max_round" + 'class);
+		'custom_mob_class = true;
+	}else{
+		'max_round = .max_round;
+	}
+	end;
+OnInstanceDestroy:
+	callsub OnSqlUpdate;
+	if(attachrid('sd)){
+		showdigit 0,3;//clear showdigit
+		InOtherDimensionDigit = false;
+	}
+end;
+OnTimer15000:
+	instance_announce 'i_id,"\r\nMonsters Will appare After 15 Seconds.",1,0xFFBF5C,FW_BOLD,42;
+end;
+OnTimer30000:
+	stopnpctimer;
+	'round = 1;
+	callsub OnSpawn;
+end;
+OnMobDead:
+	'max_count--;
+	if(!'max_count){
+		'round++;
+		callsub OnSpawn;
+	}
+end;
+
+OnSpawn:
+	if('round > 'max_round){
+		instance_announce 'i_id,"\r\nThis Was The Final Stage",1,0xFFBF5C,FW_BOLD,42;
+		warp "SavePoint",0,0,'owner;
+		end;
+	}
+	instance_announce 'i_id,"\r\n\r\nStage : " + 'round,1,0xFFBF5C,FW_BOLD,42;
+	if('custom_mob_class == -1){
+		copyarray .@m,getd(".m_" + 'round + "_" + 'class),getarraysize(getd(".m_" + 'round + "_" + 'class));
+		copyarray .@c,getd(".c_" + 'round + "_" + 'class),getarraysize(getd(".c_" + 'round + "_" + 'class));
+	}else{
+		copyarray .@m,getd(".m_" + 'round),getarraysize(getd(".m_" + 'round));
+		copyarray .@c,getd(".c_" + 'round),getarraysize(getd(".c_" + 'round));
+	}
+	for(.@i=0;.@i<getarraysize(.@m);.@i++){
+		if(.@m[.@i] && .@c[.@i]){
+			monster 'map$,0,0,"--en--",.@m[.@i],.@c[.@i],strnpcinfo(3) + "::OnMobDead";
+			'max_count += .@c[.@i];
+		}
+	}
+end;
+
+OnSqlUpdate:
+	query_sql("SELECT `max_round` FROM `" + .sql_t$ + "` WHERE `char_id` = '" + 'owner + "'",.@max);
+	if(.@max){
+		if('round > .@max){
+			query_sql("UPDATE `" + .sql_t$ + "` SET max_round= '" + 'round +"',class='" + 'class + "',name='" + 'owner_name$ + "' WHERE char_id ='" + 'owner + "'");
+		}
+	}else{
+		query_sql("INSERT INTO `" + .sql_t$ + "` (`name`,`char_id`,`class`,`max_round`) VALUES ('" + 'owner_name$ + "','" + 'owner + "','" + 'class + "','" + 'round + "')");
+	}
+return;
+
+
+	function Add {
+		if(getarg(0) == -1){
+			.max_round = max(getarg(1),.max_round);
+			for(.@i=2;.@i<getargcount();.@i+=2){
+				setd ".m_" + getarg(1) + "[" + .@s + "]",getarg(.@i);
+				setd ".c_" + getarg(1) + "[" + .@s + "]",getarg(.@i+1);
+				.@s++;
+			}
+		}else{
+			setd ".max_round" + getarg(0),max(getarg(1),getd(".max_round" + getarg(0)));
+			for(.@i=2;.@i<getargcount();.@i+=2){
+				setd ".m_" + getarg(1) + "_" + getarg(0) + "[" + .@s + "]",getarg(.@i);
+				setd ".c_" + getarg(1) + "_" + getarg(0) + "[" + .@s + "]",getarg(.@i+1);
+				.@s++;
+			}
+		}
+		return;
+	}
+
+}
