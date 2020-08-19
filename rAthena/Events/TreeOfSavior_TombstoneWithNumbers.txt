@@ -1,0 +1,95 @@
+//===== rAthena Script =======================================
+//= Tree Of Savior 'Tombstone With Numbers'
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//https://github.com/sader1992/sader_scripts
+//= Email sader1992@gmail.com
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//============================================================
+//= Variables Info:
+//= 'COOLDOWN_TOMBSTONE_WITH_NUMBERS' the cool-down timer
+//============================================================
+//= Description:
+//= This NPC is in a lot of tree of savior maps
+//= with deferent attempt number and deferent rage
+//= the rewards normally buff/items
+//= the NPC cool-down on winning is 20min and on losing is none
+//= if you want more than 1 copy from this NPC you need to use deferent variable for each NPC , or else they will share the same cool-down.
+//============================================================
+prontera,154,173,4	script	Tombstone With Numbers	406,{
+	.@npcName$ = "[" + strnpcinfo(1) + "]";
+
+	if (COOLDOWN_TOMBSTONE_WITH_NUMBERS > gettimetick(2)){
+		.@Time = COOLDOWN_TOMBSTONE_WITH_NUMBERS - gettimetick(2);
+		.@minutes = (.@Time % (60 * 60)) / 60;
+		.@seconds = .@Time % 60;
+		mes .@npcName$;
+		mes "Please come back after " + sprintf("%02d:%02d", .@minutes, .@seconds);
+		close;
+	}
+
+	mes .@npcName$;
+	mes "Remaining Attempt : " + .ATTEMPT;
+	mes "The Range is : " + .MINI_NUM + " - " + .MAX_NUM;
+	mes "Please select it within the range";
+
+	.@rand = rand(.MINI_NUM,.MAX_NUM);
+	.@attempt = .ATTEMPT;
+	.@mini = .MINI_NUM;
+	.@max = .MAX_NUM;
+	//debugmes "" + .@rand;	//debug for GM
+	while(.@number != .@rand && .@attempt){
+		input .@number;
+		clear;
+		if(.@number < .@mini || .@number > .@max || .@number == .@mini || .@number == .@max){
+			mes "Invalid Input";
+			next;
+		}else{
+			.@attempt --;
+
+			if(.@number == .@rand)
+				break;
+
+			if(.@number < .@rand)
+				.@mini = .@number;
+
+			if(.@number > .@rand)
+				.@max = .@number;
+		}
+
+		mes .@npcName$;
+		mes "Remaining Attempt : " + .@attempt;
+		mes "The Range is : " + .@mini + " - " + .@max;
+		mes "Please select it within the range";
+
+	}
+	clear;
+	mes .@npcName$;
+	if(.@number == .@rand){
+		specialeffect2 77;
+		mes .@number + " is the correct answer.";
+		npctalk .@npcName$ + ": " + .@number + " is the correct answer.",strnpcinfo(3),bc_self;
+		COOLDOWN_TOMBSTONE_WITH_NUMBERS = gettimetick(2) + (.COOLDOWN_WIN * 60);
+		//================================
+		//you can add buffs etc for reward
+		getitem 502,5;	//example for reward
+		//================================
+		close;
+	}
+	mes "the correct answer is " + .@rand;
+	COOLDOWN_TOMBSTONE_WITH_NUMBERS = gettimetick(2) + (.COOLDOWN_LOSS * 60);
+	close;
+end;
+OnInit:
+	specialeffect 203;
+
+	.MINI_NUM = 1;
+	.MAX_NUM = 500;
+	.ATTEMPT = 7;
+
+	.COOLDOWN_WIN = 20;	//cool-down on Wining in minutes
+	.COOLDOWN_LOSS = 0;	//cool-down on Losing in minutes
+end;
+}

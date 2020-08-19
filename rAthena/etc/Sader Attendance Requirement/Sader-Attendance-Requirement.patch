@@ -1,0 +1,31 @@
+From b24022df7396f8cd1c2b9abf5e861a01b36aee7f Mon Sep 17 00:00:00 2001
+From: Sader Fawall <sader1992@hotmail.com>
+Date: Sat, 27 Jul 2019 20:00:56 +0200
+Subject: [PATCH] Sader Attendance Requirement
+
+---
+ src/map/pc.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/map/pc.cpp b/src/map/pc.cpp
+index 6fd4adb6c..43ffdfd8c 100755
+--- a/src/map/pc.cpp
++++ b/src/map/pc.cpp
+@@ -13114,6 +13114,14 @@ void pc_attendance_claim_reward( struct map_session_data* sd ){
+ 		return;
+ 	}
+ 
++	//Sader Attendance Requirement
++	char attendance_requirement[NAME_LENGTH];
++	sprintf(attendance_requirement, "#Attendance_%d", date_get(DT_YYYYMMDD));
++	if (!pc_readreg2(sd, attendance_requirement)) {
++		clif_messagecolor(&sd->bl, color_table[COLOR_LIGHT_GREEN], "You don't meet the requirement.", false, SELF);
++		return;
++	}
++
+ 	int32 attendance_counter = pc_readreg2( sd, ATTENDANCE_COUNT_VAR );
+ 
+ 	attendance_counter += 1;
+-- 
+2.17.1.windows.2
+

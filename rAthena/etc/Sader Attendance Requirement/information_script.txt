@@ -1,0 +1,66 @@
+//===== rAthena Script =======================================
+//= Sader Attendance Requirement
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//= Email sader1992@gmail.com
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//============================================================
+
+
+//Add to your rathena/npc/other/Global_Functions.txt
+//-----------------------------------------------------------------------
+//set_attendance_requirement(); allow the player to get the attendance
+function	script	set_attendance_requirement	{
+	setd "#Attendance_" + gettime(DT_YYYYMMDD),true;
+	return;
+}
+//get_attendance_requirement(); return true if the requirement already met
+function	script	get_attendance_requirement	{
+	return getd("#Attendance_" + gettime(DT_YYYYMMDD));
+}
+//-----------------------------------------------------------------------
+
+
+//-------------------------
+//------ Examples ---------
+//-------------------------
+//kill quest example.
+prontera,157,190,0	script	attendance_kill_quest_example	444,{
+	if(get_attendance_requirement()){
+		mes "you already got the requirement for the attendance";
+		end;
+	}
+	mes "you need to kill 100 poring to get the attendance";
+	end;
+OnNPCKillEvent:
+	if(killedrid == 1002){
+		attendance_poring_kills++;
+		if(attendance_poring_kills >= 100){
+			set_attendance_requirement();
+			attendance_poring_kills = 0;
+		}
+	}
+end;
+}
+
+//gather quest example.
+prontera,155,190,0	script	attendance_gather_quest_example	444,{
+	if(get_attendance_requirement()){
+		mes "you already got the requirement for the attendance";
+		end;
+	}
+	if(countitem(503) >= 300){
+		disable_items;
+		mes "do you want to give me (300) " + getitemname(503) + " to open the attendance ?";
+		if(select("yes:no") == 1){
+			delitem 503,300;
+			set_attendance_requirement();
+			end;
+		}
+		clear;
+	}
+	mes "you need to give me (300) " + getitemname(503) + " to get the attendance";
+	end;
+}

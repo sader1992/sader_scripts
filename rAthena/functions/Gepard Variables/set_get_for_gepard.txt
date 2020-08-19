@@ -1,0 +1,155 @@
+//===== rAthena Script =======================================
+//= set and get for gepard
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//= https://github.com/sader1992/sader_scripts
+//===== Description: =========================================
+//= gepard_int_get(<"key">,{<index>{,<"unique id">}});
+//= gepard_string_get(<"key">,{<index>{,<"unique id">}});
+//= gepard_int_set(<"key">,<value>{,<index>{,<"unique id">}});
+//= gepard_string_set(<"key">,<"value">{,<index>{,<"unique id">}});
+//===== READ ME!: ============================================                          <<<<<<<  READ ME!
+//= YOU MUST RUN THE SQL SCRIPT IN YOUR MAIN SQL FIRST!!!!!
+//= you should add this to the end of your 'rathena/npc/other/Global_Functions.txt'
+//============================================================
+/*
+//ADD THIS TO YOUR SQL!
+
+CREATE TABLE IF NOT EXISTS `gepard_reg_num` (
+  `unique_id` int(11) unsigned NOT NULL default '0',
+  `key` varchar(32) binary NOT NULL default '',
+  `index` int(11) unsigned NOT NULL default '0',
+  `value` int(11) NOT NULL default '0',
+  PRIMARY KEY (`unique_id`,`key`,`index`),
+  KEY `unique_id` (`unique_id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `gepard_reg_str` (
+  `unique_id` int(11) unsigned NOT NULL default '0',
+  `key` varchar(32) binary NOT NULL default '',
+  `index` int(11) unsigned NOT NULL default '0',
+  `value` varchar(254) NOT NULL default '0',
+  PRIMARY KEY (`unique_id`,`key`,`index`),
+  KEY `unique_id` (`unique_id`)
+) ENGINE=MyISAM;
+
+*/
+//.@i = gepard_int_get(<"key">,{<index default 0>{,<"unique id not needed if it's the same account">}});
+function	script	gepard_int_get	{
+	.@count = getargcount();
+	if(.@count < 1){
+		debugmes "gepard_int_get: you have to pass atleast 1 argement with this function";
+		debugmes "the script will end now to prevent any bug.";
+		end;
+	}
+	.@key$ = getarg(0);
+	if(.@count > 2){
+		.@unique_id$ = getarg(2);
+	}else{
+		.@unique_id$ = get_unique_id();
+	}
+	
+	if(.@count > 1){
+		.@ndx = getarg(1);
+	}else{
+		.@ndx = 0;
+	}
+
+	query_sql("SELECT `value` FROM `gepard_reg_num` WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'",.@value);
+	
+	return .@value;
+}
+//.@i$ = gepard_int_get(<"key">,{<index default 0>{,<"unique id not needed if it's the same account">}});
+function	script	gepard_string_get	{
+	.@count = getargcount();
+	if(.@count < 1){
+		debugmes "gepard_string_get: you have to pass atleast 1 argement with this function";
+		debugmes "the script will end now to prevent any bug.";
+		end;
+	}
+	.@key$ = getarg(0);
+	if(.@count > 2){
+		.@unique_id$ = getarg(2);
+	}else{
+		.@unique_id$ = get_unique_id();
+	}
+	
+	if(.@count > 1){
+		.@ndx = getarg(1);
+	}else{
+		.@ndx = 0;
+	}
+
+	query_sql("SELECT `value` FROM `gepard_reg_str` WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'",.@value$);
+	
+	return .@value$;
+}
+
+//gepard_int_set(<"key">,<value>{,<index default 0>{,<"unique id not needed if it's the same account">}});
+function	script	gepard_int_set	{
+	.@count = getargcount();
+	if(.@count < 2){
+		debugmes "gepard_int_set: you have to pass atleast 2 argement with this function.";
+		debugmes "the script will end now to prevent any bug.";
+		end;
+	}
+	.@key$ = getarg(0);
+	.@value = getarg(1);
+	if(.@count > 3){
+		.@unique_id$ = getarg(3);
+	}else{
+		.@unique_id$ = get_unique_id();
+	}
+
+	if(.@count > 2){
+		.@ndx = getarg(2);
+	}else{
+		.@ndx = 0;
+	}
+
+	query_sql("SELECT `key` FROM `gepard_reg_num` WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'",.@exist$);
+
+	if(.@exist$ == .@key$){
+		query_sql("UPDATE `gepard_reg_num` SET `value` = '" + .@value +"' WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'");
+	}else{
+		query_sql("INSERT INTO `gepard_reg_num` (`unique_id`,`key`,`index`,`value`) VALUES ('" + .@unique_id$ + "', '" + .@key$ + "', '" + .@ndx + "', '" + .@value + "')");
+	}
+	return true;
+}
+
+//gepard_string_set(<"key">,<value>{,<index default 0>{,<"unique id not needed if it's the same account">}});
+function	script	gepard_string_set	{
+	.@count = getargcount();
+	if(.@count < 2){
+		debugmes "gepard_string_set: you have to pass atleast 2 argement with this function.";
+		debugmes "the script will end now to prevent any bug.";
+		end;
+	}
+	.@key$ = getarg(0);
+	.@value$ = escape_sql(getarg(1));
+	if(.@count > 3){
+		.@unique_id$ = getarg(3);
+	}else{
+		.@unique_id$ = get_unique_id();
+	}
+
+	if(.@count > 2){
+		.@ndx = getarg(2);
+	}else{
+		.@ndx = 0;
+	}
+
+	query_sql("SELECT `key` FROM `gepard_reg_str` WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'",.@exist$);
+
+	if(.@exist$ == .@key$){
+		query_sql("UPDATE `gepard_reg_str` SET `value` = '" + .@value$ +"' WHERE `unique_id` = '" + .@unique_id$ + "' AND `key` = '" + .@key$ + "' AND `index` = '" + .@ndx + "'");
+	}else{
+		query_sql("INSERT INTO `gepard_reg_str` (`unique_id`,`key`,`index`,`value`) VALUES ('" + .@unique_id$ + "', '" + .@key$ + "', '" + .@ndx + "', '" + .@value$ + "')");
+	}
+	return true;
+}

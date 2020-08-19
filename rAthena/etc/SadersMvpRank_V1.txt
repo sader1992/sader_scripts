@@ -1,0 +1,70 @@
+//===== rAthena Script =======================================
+//= saders Mvp Rank
+//===== By: ==================================================
+//= Sader1992
+//= Free!!
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//https://github.com/sader1992/sader_scripts
+//===== Description: =========================================
+//==== it work with the log_mvpdrop ,if the logs in your server are disable it wont work.
+//============================================================
+//==== please report any error you find
+//============================================================
+//============================================================
+/*
+rAthena/conf/log_athena.conf
+log_mvpdrop: no
+to
+log_mvpdrop: yes
+
+*/
+
+prontera,147,175,0	script	MvP Rank	100,{
+	mes "[Update Every Hour]";
+	query_logsql( "select `char_id`, `char_name` , `kills` from `sader_MvP_log` where `kills` > '0' order by `kills` DESC", .@char_id, .@name$, .@kills );
+
+	if(!getarraysize(.@char_id)){
+		mes "there is no Rank yet";
+		close;
+	}
+
+	mes "[My Kills]";
+	.@myRank = inarray(.@char_id, getcharid(0));
+	if(.@myRank >= 0){
+		mes (.@myRank + 1) + " ^0024E8You^000000 Have ^FF0000" + .@kills[.@myRank] + "^000000 MVP Kills .";
+	}else{
+		mes "you killed ^FF0000" + 0 + " MvPs.^000000";
+	}
+
+	mes "[MvP Rank]";
+	for(.@i=0;.@i<getarraysize(.@char_id);.@i++){
+		mes (.@i + 1) + " ^0024E8" + .@name$[.@i] + "^000000 Have ^FF0000" + .@kills[.@i] + "^000000 MVP Kills .";
+	}
+end;
+
+OnUpdate:
+OnMinute01:
+	freeloop(1);
+	query_logsql("TRUNCATE `sader_MvP_log`");
+	query_logsql( "select `kill_char_id` from `mvplog` ", .@char_id);
+	.@complete = 10000000;	//to ignore error it would be fixed later in rAthena
+	for(.@i=0;.@i<getarraysize(.@char_id);.@i++){
+		if(inarray(.@complete,.@char_id[.@i]) == -1){
+			query_sql( "select `name` from `char` where `char_id` = '" + .@char_id[.@i] + "'", .@name$ );
+			.@Player = .@char_id[.@i];
+			query_logsql("INSERT INTO `sader_MvP_log` (`char_id`,`char_name` ,`kills`) VALUES ('" + .@char_id[.@i] + "', '" + .@name$ + "', '" + countinarray(.@char_id,.@Player) + "')");
+			.@complete[getarraysize(.@complete)] = .@char_id[.@i];
+		}
+	}
+	freeloop(0);
+end;
+
+OnInit:
+	bindatcmd("rankupdate",strnpcinfo(3)+"::OnUpdate",50,99);
+	query_logsql("CREATE TABLE IF NOT EXISTS `sader_MvP_log` (`char_id` INT NOT NULL,`char_name` VARCHAR(30) NOT NULL,`kills` INT NOT NULL) ENGINE=MyISAM");
+end;
+}

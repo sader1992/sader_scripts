@@ -1,0 +1,391 @@
+//===== rAthena Script =======================================
+//= Sky Fortress Enchantment Functions
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Changelogs: ==========================================
+//= 1.0 First version.
+//============================================================
+//SkyFortressWeapon(<itemid>{,<identify>{,<keep>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<RandomIDArray>,<RandomValueArray>,<RandomParamArray>}}});
+//------
+//<keep>: the number of the enchantment you want to keep (1,2,3) , 4 if you want to reroll all.
+//if not reroll , you can just 'SkyFortressWeapon(<itemid>);'
+//will give the player an enchanted weapon id
+//============================================================
+//SkyFortressMonster(<Monster ID>);
+//------
+//this return a random weapon that drop from that monster!
+//============================================================
+//SkyFortressDrop(<Monster ID>);
+//------
+//this function is a shurtcut to give the player the item on mob kill event
+//you can add in the mob kill event something like
+//SkyFortressDrop(killedrid);
+//the chance of drop is the global variable '$SKYFORTRESS_CHANCE'%
+//so all you need to change the drop chance for example to 5%
+//in game do this command
+//@set $SKYFORTRESS_CHANCE 5
+//this will make the drop chance for a weapon from the list is 5%
+//============================================================
+
+//SkyFortressMonster(<Monster ID>);
+function	script	SkyFortressMonster	{
+	.@MobID = getarg(0);
+
+	switch(.@MobID){
+		case 3479:	//Immortal Zombie Assault
+			//28605 Vicious Mind Book [1]
+			//13328 Vicious Mind Huuma Shuriken [1]
+			//1800 Vicious Mind Knuckle [1]
+			//1450 Vicious Mind Lance [1]
+			//16041 Vicious Mind Mace [1]
+			setarray .@SF_W,28605,13328,1800,1450,16041;
+			break;
+			
+		case 3480:	//Immortal Cursed Zombie
+			//18121 Vicious Mind Bow [1]
+			//13128 Vicious Mind Revolver [1]
+			//1600 Vicious Mind Rod [1]
+			//2026 Vicious Mind Two-Handed Staff [1]
+			//28107 Vicious Mind Two-Handed Axe [1]
+			setarray .@SF_W,18121,13128,1600,2026,28107;
+			break;
+			
+		case 3477:	//Immortal Fortress Legion
+			//28706 Vicious Mind Dagger [1]
+			//28008 Vicious Mind Katar [1]
+			//13455 Vicious Mind Saber [1]
+			//1400 Vicious Mind Spear [1]
+			//21016 Vicious Mind Two-Handed Sword [1]
+			setarray .@SF_W,28706,28008,13455,1400,21016;
+			break;
+			
+		case 3482:	//Immortal Angry Shadow
+			//1900 Vicious Mind Violin [1]
+			setarray .@SF_W,1900;
+			break;
+			
+		case 3481:	//3481 Immortal Nightmare Shadow
+			//1996 Vicious Mind Wire [1]
+			setarray .@SF_W,1996;
+			break;
+		
+		default:
+			return false;
+	}
+
+	//return random item id from the array.
+	return .@SF_W[rand(getarraysize(.@SF_W))];
+}
+
+//BALANCED ROLL
+function	script	r	{
+	.@n = getarg(0);
+	.@x = getarg(1);
+	return rand(.@n,rand(.@n,.@x));
+}
+
+//SkyFortressWeapon(<itemid>{,<identify>{,<keep>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<RandomIDArray>,<RandomValueArray>,<RandomParamArray>}}});
+//<keep>: the number of the enchantment you want to keep (1,2,3) , 4 if you want to reroll all.
+//if not reroll , you can just 'SkyFortressWeapon(<itemid>);'
+function	script	SkyFortressWeapon	{
+	.@ItemID = getarg(0);
+	.@identify = getarg(1,0);
+	setarray .@valid,28605,18121,28706,13328,28008,1800,1450,16041,13128,1600,13455,1400,2026,28107,21016,1900,1996;
+	
+	if(inarray(.@valid,.@ItemID) == -1){
+		debugmes "InValid Item ID (" + .@ItemID + ")";
+		return;
+	}
+	
+	
+	//SkyFortressWeapon(<itemid>,<identify>{,<keep>,<refine>,<attribute>,<card1>,<card2>,<card3>,<card4>{,<RandomIDArray>,<RandomValueArray>,<RandomParamArray>}});
+	//<keep>: the number of the enchantment you want to keep (1,2,3) , 4 if you want to reroll all.
+	//==========================================
+	//if reroll with keep one enchantment.
+	//==========================================
+	.@keep = getarg(2,0);	//1,2,3 (if keep 4 , all the enchantment will reroll , else only the number of the enchantment 1,2,3 will not reroll and the others will)
+	.@refine = getarg(3,0);
+	.@attribute = getarg(4,0);
+	.@card1 = getarg(5,0);
+	.@card2 = getarg(6,0);
+	.@card3 = getarg(7,0);
+	.@card4 = getarg(8,0);
+	.@RandomIDArray = getarg(9,0);
+	.@RandomValueArray = getarg(10,0);
+	.@RandomParamArray = getarg(11,0);
+	//==========================================
+	
+	//============= First Enchant ==============
+	//==========================================
+		switch(.@ItemID){
+			case 1600:	//Vicious Mind Rod [1]
+			case 2026:	//Vicious Mind Two-Handed Staff [1]
+				///Magical damage to [element] enemies +1~20%.
+				///Matk +1~10%
+				///Power of healing skills +1~20%
+				setarray .@e1,
+					//Magical damage to [element] enemies +1~20%.
+					RDMOPT_MDAMAGE_PROPERTY_NOTHING_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_WATER_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_GROUND_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_FIRE_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_WIND_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_POISON_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_SAINT_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_DARKNESS_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_TELEKINESIS_TARGET,1,20,
+					RDMOPT_MDAMAGE_PROPERTY_UNDEAD_TARGET,1,20,
+					RDMOPT_VAR_MAGICATKPERCENT,1,10,	//Matk +1~10%
+					RDMOPT_HEAL_VALUE,1,20;	//Power of healing skills +1~20%
+				break;
+			default:
+				///Physical damage to [element] enemies +1~20%.
+				///No weapon size penalty
+				///ATK +1~10%
+				setarray .@e1,
+					//Physical damage to [element] enemies +1~20%.
+					RDMOPT_DAMAGE_PROPERTY_NOTHING_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_WATER_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_GROUND_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_FIRE_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_WIND_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_POISON_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_SAINT_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_DARKNESS_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_TELEKINESIS_TARGET,1,20,
+					RDMOPT_DAMAGE_PROPERTY_UNDEAD_TARGET,1,20,
+					RDMOPT_DAMAGE_SIZE_PERFECT,1,1,	//No weapon size penalty
+					RDMOPT_VAR_ATKPERCENT,1,10;	//ATK +1~10%
+				break;
+		}
+		
+		//Weapon cannot be broken in battle.
+		switch(.@ItemID){
+			case 21016:	//Vicious Mind Two-Handed Sword [1]
+			case 1450:	//Vicious Mind Lance [1]
+			case 1400:	//Vicious Mind Spear [1]
+			case 28008:	//Vicious Mind Katar [1]
+			case 1800:	//Vicious Mind Knuckle [1]
+			case 28107:	//Vicious Mind Two-Handed Axe [1]
+			case 16041:	//Vicious Mind Mace [1]
+			case 13455:	//Vicious Mind Saber [1]
+			case 1900:	//Vicious Mind Violin [1]
+			case 1996:	//Vicious Mind Wire [1]
+			case 13128:	//Vicious Mind Revolver [1]
+			case 18121:	//Vicious Mind Bow [1]
+				setarray .@e1[getarraysize(.@e1)],RDMOPT_WEAPON_INDESTRUCTIBLE,1,1;
+		}
+
+	//============ Second Enchant ==============
+	//==========================================
+		switch(.@ItemID){
+			case 1600:	//Vicious Mind Rod [1]
+			case 2026:	//Vicious Mind Two-Handed Staff [1]
+				///Magical damage to [race] enemies +1~20%
+				///Magical damage to boss enemies +1~20%
+				///Magical damage to normal enemies +1~20%
+				///Bypass 1~30% of MDEF on [race] enemies
+				///Bypass 1~30% of MDEF on boss enemies
+				///Bypass 1~30% of MDEF on normal enemies
+				setarray .@e2,
+					//Magical damage to [race] enemies +1~20%
+					RDMOPT_RACE_MDAMAGE_NOTHING,1,20,
+					RDMOPT_RACE_MDAMAGE_UNDEAD,1,20,
+					RDMOPT_RACE_MDAMAGE_ANIMAL,1,20,
+					RDMOPT_RACE_MDAMAGE_PLANT,1,20,
+					RDMOPT_RACE_MDAMAGE_INSECT,1,20,
+					RDMOPT_RACE_MDAMAGE_FISHS,1,20,
+					RDMOPT_RACE_MDAMAGE_DEVIL,1,20,
+					RDMOPT_RACE_MDAMAGE_HUMAN,1,20,
+					RDMOPT_RACE_MDAMAGE_ANGEL,1,20,
+					RDMOPT_RACE_MDAMAGE_DRAGON,1,20,
+					
+					RDMOPT_CLASS_MDAMAGE_NORMAL,1,20,	//Magical damage to normal enemies +1~20%
+					RDMOPT_CLASS_MDAMAGE_BOSS,1,20,	//Magical damage to boss enemies +1~20%
+					
+					//Bypass 1~30% of MDEF on [race] enemies
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_NOTHING,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_UNDEAD,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_ANIMAL,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_PLANT,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_INSECT,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_FISHS,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_DEVIL,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_HUMAN,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_ANGEL,1,30,
+					RDMOPT_RACE_IGNORE_MDEF_PERCENT_DRAGON,1,30,
+					
+					RDMOPT_CLASS_IGNORE_MDEF_PERCENT_NORMAL,1,30,	//Bypass 1~30% of MDEF on normal enemies
+					RDMOPT_CLASS_IGNORE_MDEF_PERCENT_BOSS,1,30;	//Bypass 1~30% of MDEF on boss enemies
+				break;
+			default:
+				///Physical damage to [race] enemies +1~20%
+				///Physical damage to normal enemies +1~20%
+				///Physical damage to boss enemies +1~20%
+				///Bypass 1~30% of DEF on [race] enemies
+				///Bypass 1~30% of DEF on normal enemies
+				///Bypass 1~30% of DEF on boss enemies
+				setarray .@e2,
+					//Physical damage to [race] enemies +1~20%
+					RDMOPT_RACE_DAMAGE_NOTHING,1,20,
+					RDMOPT_RACE_DAMAGE_UNDEAD,1,20,
+					RDMOPT_RACE_DAMAGE_ANIMAL,1,20,
+					RDMOPT_RACE_DAMAGE_PLANT,1,20,
+					RDMOPT_RACE_DAMAGE_INSECT,1,20,
+					RDMOPT_RACE_DAMAGE_FISHS,1,20,
+					RDMOPT_RACE_DAMAGE_DEVIL,1,20,
+					RDMOPT_RACE_DAMAGE_HUMAN,1,20,
+					RDMOPT_RACE_DAMAGE_ANGEL,1,20,
+					RDMOPT_RACE_DAMAGE_DRAGON,1,20,
+					
+					RDMOPT_CLASS_DAMAGE_NORMAL_TARGET,1,20,	//Physical damage to normal enemies +1~20%
+					RDMOPT_CLASS_DAMAGE_BOSS_TARGET,1,20,	//Physical damage to boss enemies +1~20%
+					
+					//Bypass 1~30% of DEF on [race] enemies
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_NOTHING,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_UNDEAD,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_ANIMAL,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_PLANT,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_INSECT,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_FISHS,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_DEVIL,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_HUMAN,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_ANGEL,1,30,
+					RDMOPT_RACE_IGNORE_DEF_PERCENT_DRAGON,1,30,
+					
+					RDMOPT_CLASS_IGNORE_DEF_PERCENT_NORMAL,1,30,	//Bypass 1~30% of DEF on normal enemies
+					RDMOPT_CLASS_IGNORE_DEF_PERCENT_BOSS,1,30;	//Bypass 1~30% of DEF on boss enemies
+				break;
+		}
+
+	//============= Third Enchant ==============
+	//==========================================
+		switch(.@ItemID){
+			case 21016:	//Vicious Mind Two-Handed Sword [1]
+			case 1450:	//Vicious Mind Lance [1]
+			case 1400:	//Vicious Mind Spear [1]
+			case 28008:	//Vicious Mind Katar [1]
+			case 1800:	//Vicious Mind Knuckle [1]
+				setarray .@e3,
+					RDMOPT_VAR_STRAMOUNT,1,10,	//STR +1~10
+					RDMOPT_VAR_AGIAMOUNT,1,10,	//AGI +1~10
+					RDMOPT_VAR_LUKAMOUNT,1,10,	//LUK +1~10
+					RDMOPT_VAR_ATTPOWER,1,50,	//ATK +1~50
+					RDMOPT_VAR_CRITICALSUCCESSVALUE,1,20,	//CRIT +1~20
+					RDMOPT_VAR_PLUSASPDPERCENT,1,5,	//ASPD +1~5%
+					RDMOPT_VAR_PLUSASPD,1,5,	//ASPD +1~5
+					RDMOPT_DAMAGE_CRI_TARGET,1,20;	//Critical damage +1~20%
+				break;
+			case 13328:	//Vicious Mind Huuma Shuriken [1]
+			case 28605:	//Vicious Mind Book [1]
+			case 28706:	//Vicious Mind Dagger [1]
+				setarray .@e3,
+					RDMOPT_VAR_STRAMOUNT,1,10,	//STR +1~10
+					RDMOPT_VAR_AGIAMOUNT,1,10,	//AGI +1~10
+					RDMOPT_VAR_INTAMOUNT,1,10,	//INT +1~10
+					RDMOPT_VAR_ATTPOWER,1,50,	//ATK +1~50
+					RDMOPT_VAR_ATTMPOWER,1,50,	//MATK +1~50
+					RDMOPT_VAR_PLUSASPDPERCENT,1,5,	//ASPD +1~5%
+					RDMOPT_VAR_PLUSASPD,1,5,	//ASPD +1~5
+					RDMOPT_DEC_SPELL_DELAY_TIME,1,20,	//After cast delay -1~20%
+					RDMOPT_DEC_SPELL_CAST_TIME,1,20;	//Variable cast time -1~20%
+				break;
+			case 28107:	//Vicious Mind Two-Handed Axe [1]
+			case 16041:	//Vicious Mind Mace [1]
+			case 13455:	//Vicious Mind Saber [1]
+				setarray .@e3,
+					RDMOPT_VAR_STRAMOUNT,1,10,	//STR +1~10
+					RDMOPT_VAR_DEXAMOUNT,1,10,	//DEX +1~10
+					RDMOPT_VAR_ATTPOWER,1,50,	//ATK +1~50
+					RDMOPT_VAR_CRITICALSUCCESSVALUE,1,20,	//CRIT +1~20
+					RDMOPT_VAR_PLUSASPD,1,5,	//ASPD +1~5
+					RDMOPT_DAMAGE_CRI_TARGET,1,20,	//Critical damage +1~20%
+					RDMOPT_RANGE_ATTACK_DAMAGE_TARGET,1,20;	//Ranged damage +1~20%
+				break;
+			case 1900:	//Vicious Mind Violin [1]
+			case 1996:	//Vicious Mind Wire [1]
+			case 13128:	//Vicious Mind Revolver [1]
+			case 18121:	//Vicious Mind Bow [1]
+				setarray .@e3,
+					RDMOPT_VAR_AGIAMOUNT,1,10,	//AGI +1~10
+					RDMOPT_VAR_DEXAMOUNT,1,10,	//DEX +1~10
+					RDMOPT_VAR_LUKAMOUNT,1,10,	//LUK +1~10
+					RDMOPT_VAR_ATTPOWER,1,50,	//ATK +1~50
+					RDMOPT_VAR_CRITICALSUCCESSVALUE,1,20,	//CRIT +1~20
+					RDMOPT_VAR_PLUSASPDPERCENT,1,5,	//ASPD +1~5%
+					RDMOPT_DAMAGE_CRI_TARGET,1,20,	//Critical damage +1~20%
+					RDMOPT_RANGE_ATTACK_DAMAGE_TARGET,1,20;	//Ranged damage +1~20%
+				break;
+			case 1600:	//Vicious Mind Rod [1]
+			case 2026:	//Vicious Mind Two-Handed Staff [1]
+				setarray .@e3,
+					RDMOPT_VAR_DEXAMOUNT,1,10,	//DEX +1~10
+					RDMOPT_VAR_INTAMOUNT,1,10,	//INT +1~10
+					RDMOPT_VAR_ATTMPOWER,1,50,	//MATK +1~50
+					RDMOPT_DEC_SPELL_DELAY_TIME,1,20,	//After cast delay -1~20%
+					RDMOPT_DEC_SP_CONSUMPTION,1,10,	//Skill SP cost -1~10%
+					RDMOPT_DEC_SPELL_CAST_TIME,1,20;	//Variable cast time -1~20%
+					
+				break;
+		}
+	
+	for(.@i=0;.@i<getarraysize(.@e1);.@i+=3){
+		.@s = getarraysize(.@e1_ID);
+		.@e1_ID[.@s] = .@e1[.@i];
+		.@e1_V_Min[.@s] = .@e1[.@i + 1];
+		.@e1_V_Max[.@s] = .@e1[.@i + 2];
+	}
+	
+	for(.@i=0;.@i<getarraysize(.@e2);.@i+=3){
+		.@s = getarraysize(.@e2_ID);
+		.@e2_ID[.@s] = .@e2[.@i];
+		.@e2_V_Min[.@s] = .@e2[.@i + 1];
+		.@e2_V_Max[.@s] = .@e2[.@i + 2];
+	}
+	
+	for(.@i=0;.@i<getarraysize(.@e3);.@i+=3){
+		.@s = getarraysize(.@e3_ID);
+		.@e3_ID[.@s] = .@e3[.@i];
+		.@e3_V_Min[.@s] = .@e3[.@i + 1];
+		.@e3_V_Max[.@s] = .@e3[.@i + 2];
+	}
+	
+	.@s1 = rand(getarraysize(.@e1_ID));
+	.@s2 = rand(getarraysize(.@e2_ID));
+	.@s3 = rand(getarraysize(.@e3_ID));
+	
+	setarray .@IDs,.@e1_ID[.@s1],.@e2_ID[.@s2],.@e3_ID[.@s3];
+	setarray .@Values,r(.@e1_V_Min[.@s1],.@e1_V_Max[.@s1]),r(.@e2_V_Min[.@s2],.@e2_V_Max[.@s2]),r(.@e3_V_Min[.@s3],.@e3_V_Max[.@s3]);
+	setarray .@Param,0,0,0;
+	
+	if(.@keep){
+		if(.@keep == 4){
+			//reroll all enchantments
+			getitem3 .@ItemID,1,.@identify,.@refine,.@attribute,.@card1,.@card2,.@card3,.@card4,.@IDs,.@Values,.@Param;
+		}else{
+			//reroll and keep .@keep enchantment
+			.@IDs[.@keep - 1] = .@RandomIDArray;
+			.@Values[.@keep - 1] = .@RandomValueArray;
+			.@Param[.@keep - 1] = .@RandomParamArray;
+			getitem3 .@ItemID,1,.@identify,.@refine,.@attribute,.@card1,.@card2,.@card3,.@card4,.@IDs,.@Values,.@Param;
+		}
+	}else{
+		getitem3 .@ItemID,1,.@identify,0,0,0,0,0,0,.@IDs,.@Values,.@Param;
+	}
+
+	return;
+}
+
+
+//SkyFortressDrop(<Monster ID>);
+//THE CHANCE OF DROP IS $SKYFORTRESS_CHANCE%
+function	script	SkyFortressDrop	{
+	.@MobID = getarg(0);
+	if(rand(1,100) <= $SKYFORTRESS_CHANCE){
+		//debugmes "" + killedrid;
+		.@WeaponID = SkyFortressMonster(.@MobID);
+		SkyFortressWeapon(.@WeaponID);
+	}
+	return;
+}

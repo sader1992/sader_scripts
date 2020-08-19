@@ -1,0 +1,120 @@
+//===== rAthena Script =======================================
+//= Free Script
+//===== By: ==================================================
+//= Sader1992
+//= https://rathena.org/board/profile/30766-sader1992/
+//= Email sader1992@gmail.com
+//===== Compatible With: =====================================
+//= rAthena Project
+//= ==========================================================
+//= @aitem this command allows you to check how many of the item in the server
+//= command @aitem2 allows you to check also who have the items
+//= @aitem is fast, but @aitem2 will take some time to finish
+//= the time depend on how big your database is!
+//= ==========================================================
+//= you should wait until the command is done , do not logout/talk to npc/ anything until you get the results!
+//= ==========================================================
+//= '@AnalyzeItem' return the count of the item in the server.
+//= '@AnalyzeItem2' return the count of the item and the lst of who have it in the server (take more time).
+//= USAGE:
+//= @AnalyzeItem <ITEM_ID>
+//= @AnalyzeItem2 <ITEM_ID>
+//= OR
+//= @AItem <ITEM_ID>
+//= @AItem2 <ITEM_ID>
+//= Wait until you get the results in your chat
+//= to add more tables (like other storages) check the array .@tables$ and .@id$
+//= F_GET_REAL_OWNER_NAME(<"string table">,<id>) get the name for id
+//============================================================
+function	script	F_GET_REAL_OWNER_NAME	{
+	.@table$ = getarg(0);
+	.@id = getarg(1);
+	.@n$ = "";
+	if(.@table$ != "account_id" && .@table$ != "char_id"){
+		if(.@table$ != "id"){
+			return "(Mails):";
+		}else{
+			return "(Guilds):";
+		}
+	}
+	.@acc = .@id;
+	if(.@table$ == "char_id"){
+		query_sql("SELECT `account_id` FROM `char` WHERE `char_id` = '" + .@id + "'",.@acc);
+	}
+	query_sql("SELECT `group_id`,`userid` FROM `login` WHERE `account_id` = '" + .@acc + "'",.@g,.@name$);
+	if(.@g >= 1){
+		.@n$ = "[CM]";
+	}
+	if(.@g >= 89){
+		.@n$ = "[GM]";
+	}
+	.@name1$ = .@n$ + .@name$;
+	return .@name1$;
+}
+
+-	script	AnalyzeItem	-1,{
+OnInit:
+	bindatcmd("AnalyzeItem",strnpcinfo(3)+"::OnCommand",90,99);
+	bindatcmd("AnalyzeItem2",strnpcinfo(3)+"::OnCommand2",90,99);
+	bindatcmd("AItem",strnpcinfo(3)+"::OnCommand",90,99);
+	bindatcmd("AItem2",strnpcinfo(3)+"::OnCommand2",90,99);
+end;
+OnCommand2:
+	.@owner_name = true;
+OnCommand:
+	.@command[0] = atoi(.@atcmd_parameters$[0]);
+	if(.@command[0] <= 0){
+		dispbottom "@AnalyzeItem <ITEM_ID>",0x9FFFB5;
+		end;
+	}
+	if(getitemname(.@command[0]) == "null"){
+		dispbottom "Invalid Item ID!",0x9FFFB5;
+		dispbottom "@AnalyzeItem <ITEM_ID>",0x9FFFB5;
+		dispbottom "@AnalyzeItem2 <ITEM_ID>",0x9FFFB5;
+		end;
+	}
+	freeloop(1);
+
+	setarray .@tables$,"cart_inventory","guild_storage","inventory","storage",  "mail_attachments";
+	setarray .@id$,		"char_id",		"guild_id",		"char_id",	"account_id","id";
+	dispbottom "Searching for item '" + getitemname(.@command[0]) + "'",0x9FFFB5;
+	dispbottom "Analyze Tables",0x9FFFB5;
+	for(.@i=0;.@i<getarraysize(.@tables$);.@i++){
+		query_sql("SELECT `amount`,`" + .@id$[.@i] + "` FROM `" + .@tables$[.@i] + "` WHERE nameid = '"+ .@command[0] +"'", .@count,.@id);
+		
+		for(.@n=0;.@n<getarraysize(.@count);.@n++){
+			.@allcounts += .@count[.@n];
+			if(.@owner_name){
+				.@n$ = F_GET_REAL_OWNER_NAME(.@id$[.@i],.@id[.@n]);
+				.@ndx = inarray(.@name_list$,.@n$);
+				if(.@ndx == -1){
+					.@ndx = getarraysize(.@name_list$);
+					.@name_list$[.@ndx] = .@n$;
+				}
+				.@count_list[.@ndx] += .@count[.@n];
+				sleep2 2;
+			}
+		}
+		sleep2 5;
+		deletearray .@count[0],getarraysize(.@count);
+	}
+	if(.@owner_name){
+		dispbottom "==================================",0x9FFFB5;
+		dispbottom "Extended List:",0x9FFFB5;
+		if(getarraysize(.@name_list$) > 20){
+			for(.@i=0;.@i<getarraysize(.@name_list$);.@i += 3){
+				dispbottom "(" + .@name_list$[.@i] + "): (" + .@count_list[.@i] + ")" + "    " + "(" + .@name_list$[.@i+1] + "): (" + .@count_list[.@i+1] + ")" + "    " + "(" + .@name_list$[.@i+2] + "): (" + .@count_list[.@i+2] + ")",0x9FFFB5;
+			}
+		}else{
+			for(.@i=0;.@i<getarraysize(.@name_list$);.@i++){
+				dispbottom "(" + .@name_list$[.@i] + "): (" + .@count_list[.@i] + ")";
+			}
+		}
+		
+		dispbottom "==================================",0x9FFFB5;
+	}
+	dispbottom "Analyze Done.",0x9FFFB5;
+	dispbottom "(" + .@allcounts + ")" + getitemname(.@command[0]) + ".",0x9FFFB5;
+	freeloop(0);
+end;
+}

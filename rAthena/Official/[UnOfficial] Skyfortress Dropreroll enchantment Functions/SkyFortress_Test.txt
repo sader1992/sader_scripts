@@ -1,0 +1,113 @@
+//===== rAthena Script =======================================
+//= Sky Fortress reroll NPC
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Requirment: =========================================
+//= those are the test scripts for the original script
+// do not use those!
+//============================================================
+
+//3477 Immortal Fortress Legion
+//3479 Immortal Zombie Assault
+//3480 Immortal Cursed Zombie
+//3482 Immortal Angry Shadow
+//3481 Immortal Nightmare Shadow
+
+//28605 Vicious Mind Book [1]
+//18121 Vicious Mind Bow [1]
+//28706 Vicious Mind Dagger [1]
+//13328 Vicious Mind Huuma Shuriken [1]
+//28008 Vicious Mind Katar [1]
+//1800 Vicious Mind Knuckle [1]
+//1450 Vicious Mind Lance [1]
+//16041 Vicious Mind Mace [1]
+//13128 Vicious Mind Revolver [1]
+//1600 Vicious Mind Rod [1]
+//13455 Vicious Mind Saber [1]
+//1400 Vicious Mind Spear [1]
+//2026 Vicious Mind Two-Handed Staff [1]
+//28107 Vicious Mind Two-Handed Axe [1]
+//21016 Vicious Mind Two-Handed Sword [1]
+//1900 Vicious Mind Violin [1]
+//1996 Vicious Mind Wire [1]
+
+//BALANCE Test
+-	script	r_test	-1,{
+OnInit:
+	freeloop(1);
+	for(.@i=0;.@i<1000;.@i++){
+		debugmes "" + r(1,20);
+	}
+end;
+	///1~20|1000
+	//2		20
+	//12	19
+	//13	18
+	//10	17
+	//14	16
+	//18	15
+	//22	14
+	//24	13
+	//25	12
+	//43	11
+	//44	10
+	//55	9
+	//36	8
+	//60	7
+	//57	6
+	//71	5
+	//85	4
+	//94	3
+	//131	2
+	//181	1
+}
+
+//get item test from monster x id
+prontera,171,203,1	script	item from random monster	444,{
+	setarray .@m,3479,3480,3477,3482,3481;
+	.@WeaponID = SkyFortressMonster(.@m[rand(getarraysize(.@m))]);
+	SkyFortressWeapon(.@WeaponID);
+	end;
+
+	//SkyFortressWeapon(512);
+	//this will give error , as the item id is invalid!.
+}
+
+//get item from monster
+prontera,171,197,1	script	skyfortress monster_drop 100/100	444,{
+	setarray .@monster,3479,3480,3477,3482,3481;
+	getmapxy(.@m$, .@x, .@y, BL_PC);
+	monster .@m$,.@x,.@y,"--en--",.@monster[rand(getarraysize(.@monster))],1,strnpcinfo(3) + "::OnKill";
+	getitem 611,1;
+	mes "kill this monster!";
+	end;
+OnKill:
+	//(if you want to add the drop to the instance do not forget to add a random (x,y) for the item percentage chance of drop!)
+	//the instance already have on monster kill label , so you want to add to it! , you can't use another on drop label somewhere else!
+	.@WeaponID = SkyFortressMonster(killedrid);
+	SkyFortressWeapon(.@WeaponID);
+end;
+}
+
+//get item from monster with x chance (the chance is '$SKYFORTRESS_CHANCE' global variable)
+prontera,171,197,1	script	skyfortress monster_drop	444,{
+	setarray .@monster,3479,3480,3477,3482,3481;
+	getmapxy(.@m$, .@x, .@y, BL_PC);
+	monster .@m$,.@x,.@y,"--en--",.@monster[rand(getarraysize(.@monster))],1,strnpcinfo(3) + "::OnKill";
+	getitem 611,1;
+	mes "kill this monster!";
+	end;
+OnKill:
+	//the instance already have on monster kill label , so you want to add to it! , you can't use another on drop label somewhere else!
+	SkyFortressDrop(killedrid);
+end;
+}
+
+//-----------------------
+//safe error
+I see you are using the test scripts
+those not part of the original script
+do not add them if you don't know what you are doing!
+comment this to remove the map-server error and use them anyway!
+//-----------------------

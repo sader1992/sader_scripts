@@ -1,0 +1,175 @@
+//===== rAthena Script =======================================
+//= Sky Fortress reroll NPC
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Requirment: =========================================
+//= https://github.com/rathena/rathena/pull/4195
+//===== Changelogs: ==========================================
+//= 1.0 First version.
+//============================================================
+prt_q,249,75,1	script	Re-roll Vicious Mind Weapons::reroll	8W_SOLDIER,{
+
+	disable_items;
+	freeloop(1);
+	mes "Hello";
+	if(select("information:reroll") == 1){
+		mes "i can reroll your Vicious Weapon";
+		mes "you need to equip the Weapon";
+		next;
+		mes "the cost for the full reroll is";
+		mes "1x Vicious Mind Weapon (Any).";
+		mes "100,000 Zeny.";
+		next;
+		mes "Keeping a single enchant safe and re-rolling the other two will have the following cost :";
+		mes "1x Vicious Mind Weapon (Same type as the item being re-rolled).";
+		mes "5,000,000 Zeny.";
+		end;
+	}
+	clear;
+	setarray .@valid,28605,18121,28706,13328,28008,1800,1450,16041,13128,1600,13455,1400,2026,28107,21016,1900,1996;
+	.@eq = getequipid(EQI_HAND_R);
+	if(inarray(.@valid,.@eq) == -1){
+		mes "you need to equip the weapon you want to reroll in your right hand!";
+		end;
+	}
+	.@unique_id$ = getequipuniqueid(EQI_HAND_R);
+	uniqueid_getiteminfo(.@unique_id$,.@iteminfo);
+	if(.@iteminfo[0] != .@eq){
+		mes "something went wrong!";
+		mes "please contact the GM about the issue.";
+		mes "Error Code 413";
+		end;
+	}
+	
+	switch(select("Full Reroll:Reroll with keep one Enchantment:Close")){
+		clear;
+		case 1:
+			mes "are you sure you want a full reroll?";
+			mes "you need :";
+			mes "1x Vicious Mind Weapon (Any)";
+			mes "100,000 Zeny.";
+			if(select("yes:no") == 2)
+				end;
+			clear;
+			if(Zeny < 100000){
+				mes "you don't have 100,000 Zeny!";
+				end;
+			}
+			mes "select the weapon you want to spend!";
+			
+			getinventorylist;
+			for(.@i=0;.@i<@inventorylist_count;.@i++){
+				if(inarray(.@valid,@inventorylist_id[.@i]) != -1 && .@unique_id$ != @inventorylist_unique_id$[.@i]){
+					.@s = getarraysize(.@items);
+					.@items[.@s] = @inventorylist_id[.@i];
+					.@re[.@s] = @inventorylist_refine[.@i];
+					.@c1[.@s] = @inventorylist_card1[.@i];
+					.@u_id$[.@s] = @inventorylist_unique_id$[.@i];
+				}
+			}
+			if(!getarraysize(.@items)){
+				mes "you don't have another Vicious Weapon";
+				end;
+			}
+			for(.@i=0;.@i<getarraysize(.@items);.@i++){
+				.@options$ += "+" + .@re[.@i] + " " + getitemname(.@items[.@i]) + " " + getitemname(.@c1[.@i]) + ":";
+			}
+			.@select = select(.@options$) -1;
+			mes "are you sure you want to give off";
+			mes "+" + .@re[.@select] + " " + getitemname(.@items[.@select]) + " " + getitemname(.@c1[.@select]);
+			
+			if(select("yes:no") == 2)
+				end;
+			specialeffect EF_ENHANCE;
+			specialeffect2 EF_MAPPILLAR;
+			progressbar "ffff00",3;
+			specialeffect EF_REPAIRWEAPON;
+			uniqueid_delitem(.@unique_id$);	//delete the item he want to enchant.
+			uniqueid_delitem(.@u_id$[.@select]);	//delete the item he want to spend for the enchantment.
+			Zeny -= 100000;
+			SkyFortressWeapon(.@eq,.@iteminfo[2],4,.@iteminfo[1],.@iteminfo[3],.@iteminfo[4],.@iteminfo[5],.@iteminfo[6],.@iteminfo[7]);
+			mes "done!";
+			end;
+		case 2:
+			mes "you need :";
+			mes "1x " + getitemname(.@eq);
+			mes "5,000,000 Zeny.";
+			if(select("yes:no") == 2)
+				end;
+			clear;
+			if(Zeny < 5000000){
+				mes "you don't have 5,000,000 Zeny!";
+				end;
+			}
+			mes "select the weapon you want to spend!";
+			
+			getinventorylist;
+			for(.@i=0;.@i<@inventorylist_count;.@i++){
+				if(@inventorylist_id[.@i] == .@eq && .@unique_id$ != @inventorylist_unique_id$[.@i]){
+					.@s = getarraysize(.@items);
+					.@items[.@s] = @inventorylist_id[.@i];
+					.@re[.@s] = @inventorylist_refine[.@i];
+					.@c1[.@s] = @inventorylist_card1[.@i];
+					.@u_id$[.@s] = @inventorylist_unique_id$[.@i];
+				}
+			}
+	
+			if(!getarraysize(.@items)){
+				mes "you don't have another " + getitemname(.@eq);
+				end;
+			}
+			
+			for(.@i=0;.@i<getarraysize(.@items);.@i++){
+				.@options$ += "+" + .@re[.@i] + " " + getitemname(.@items[.@i]) + " " + getitemname(.@c1[.@i]) + ":";
+			}
+			
+			.@select = select(.@options$) -1;
+			mes "are you sure you want to give off";
+			mes "+" + .@re[.@select] + " " + getitemname(.@items[.@select]) + " " + getitemname(.@c1[.@select]);
+			
+			if(select("yes:no") == 2)
+				end;
+				
+			mes "please select the number of the enchantment you want to keep!";
+			mes "the number in order is 1 or 2 or 3";
+			mes "the value is the x number that the enchantment gives";
+			.@keep = select("1 Value(" + .@iteminfo[11] + "):2 Value(" + .@iteminfo[14] + "):3 Value(" + .@iteminfo[17] + ")");
+
+			switch(.@keep){
+				case 1:
+					.@k__id = .@iteminfo[10];//     - option ID 1
+					.@k__v = .@iteminfo[11];//     - option value 1
+					.@k__p = .@iteminfo[12];//     - option parameter 1
+					break;
+				case 2:
+					.@k__id = .@iteminfo[13];//     - option ID 2
+					.@k__v = .@iteminfo[14];//     - option value 2
+					.@k__p = .@iteminfo[15];//     - option parameter 2
+					break;
+				case 3:
+					.@k__id = .@iteminfo[16];//     - option ID 3
+					.@k__v = .@iteminfo[17];//     - option value 3
+					.@k__p = .@iteminfo[18];//     - option parameter 3
+					break;
+				default:
+					mes "something went wrong";
+					mes "please report to the GM";
+					mes "Error Code 414";
+					end;
+			}
+			specialeffect EF_ENHANCE;
+			specialeffect2 EF_MAPPILLAR;
+			progressbar "ffff00",3;
+			specialeffect EF_REPAIRWEAPON;
+			uniqueid_delitem(.@unique_id$);	//delete the item he want to enchant.
+			uniqueid_delitem(.@u_id$[.@select]);	//delete the item he want to spend for the enchantment.
+			Zeny -= 5000000;
+			SkyFortressWeapon(.@eq,.@iteminfo[2],.@keep,.@iteminfo[1],.@iteminfo[3],.@iteminfo[4],.@iteminfo[5],.@iteminfo[6],.@iteminfo[7],.@k__id,.@k__v,.@k__p);
+			mes "done!";
+			end;
+		default:
+			break;
+	}
+end;
+}
