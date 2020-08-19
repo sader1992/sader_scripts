@@ -1,0 +1,81 @@
+//===== rAthena Script =======================================
+//= Paid Script
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//= Email sader1992@gmail.com
+//===== Compatible With: =====================================
+//= rAthena Project 2020
+//============================================================
+//============================================================
+
+//F_Randomizer(<main array>,.@a1,.@a2{,.@a3{,.@a4}});
+//split the main array randomly between the provided arrays
+function	script	F_Randomizer	{
+	freeloop(0);
+	copyarray .@a,getarg(0),getarraysize(getarg(0));
+	while(getarraysize(.@a)){
+		.@r = rand(getarraysize(.@a));
+		.@master[getarraysize(.@master)] = .@a[.@r];
+		deletearray .@a[.@r],1;
+	}
+	.@ori = getargcount() -1;
+	if((getarraysize(.@master)%.@ori)){
+		debugmes "cannot split the main to the other arrays";
+		debugmes "Size does not match!";
+		end;
+	}
+	while(getarraysize(.@master)){
+		.@ms = getarraysize(.@master);
+		.@s = getarraysize(.@s1);
+		for(.@i=1;.@i<getargcount();.@i++){
+			setd ".@s" + .@i + "[" + .@s + "]",.@master[0];
+			deletearray .@master[0],1;
+		}
+	}
+	for(.@i=1;.@i<getargcount();.@i++){
+		deletearray getarg(.@i),getarraysize(getarg(.@i));
+		copyarray getarg(.@i),getd(".@s" + .@i),getarraysize(getd(".@s" + .@i));
+	}
+	return;
+}
+//test npc
+//-	script	Randomizer_test	-1,{
+//OnInit:
+//	debugmes "================================================";
+//	setarray .@main,1,2,3,4,5,6,7,8,9,10,11,12;
+//	for(.@i=0;.@i<getarraysize(.@main);.@i++){
+//		debugmes "" + .@main[.@i];
+//	}
+//	debugmes "================================================";
+//	debugmes "Split and randomize the elements of .@main into .@a .@b .@c .@d .@e .@f .@g arrays";
+//	debugmes "================================================";
+//	
+//	F_Randomizer(.@main,.@a,.@b,.@c,.@e,.@f,.@g);
+//	
+//	for(.@i=0;.@i<getarraysize(.@a);.@i++){
+//		debugmes ".@a " + .@a[.@i];
+//	}
+//	
+//	for(.@i=0;.@i<getarraysize(.@b);.@i++){
+//		debugmes ".@b " + .@b[.@i];
+//	}
+//	
+//	for(.@i=0;.@i<getarraysize(.@c);.@i++){
+//		debugmes ".@c " + .@c[.@i];
+//	}
+//	
+//	for(.@i=0;.@i<getarraysize(.@e);.@i++){
+//		debugmes ".@e " + .@e[.@i];
+//	}
+//	
+//	for(.@i=0;.@i<getarraysize(.@f);.@i++){
+//		debugmes ".@f " + .@f[.@i];
+//	}
+//	
+//	for(.@i=0;.@i<getarraysize(.@g);.@i++){
+//		debugmes ".@g " + .@g[.@i];
+//	}
+//	debugmes "==================================================================================";
+//end;
+//}
