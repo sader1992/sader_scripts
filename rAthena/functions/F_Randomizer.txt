@@ -1,16 +1,19 @@
 //===== rAthena Script =======================================
-//= Paid Script
+//= F_Randomizer(<main array>,.@a1,.@a2{,.@a3{,.@a4}});
 //===== By: ==================================================
 //= Sader1992
-//https://rathena.org/board/profile/30766-sader1992/
-//= Email sader1992@gmail.com
-//===== Compatible With: =====================================
-//= rAthena Project 2020
-//============================================================
-//============================================================
+//= Free!!
+// https://rathena.org/board/profile/30766-sader1992/
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: ===================================== 
+//= rAthena Project
+// https://github.com/sader1992/sader_scripts
+//===== Description: =========================================
+// split the main array randomly between the provided arrays
+// check the test npc down to see the example.
+//============================================================ 
 
-//F_Randomizer(<main array>,.@a1,.@a2{,.@a3{,.@a4}});
-//split the main array randomly between the provided arrays
 function	script	F_Randomizer	{
 	freeloop(0);
 	copyarray .@a,getarg(0),getarraysize(getarg(0));
