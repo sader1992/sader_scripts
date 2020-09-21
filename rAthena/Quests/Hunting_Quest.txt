@@ -1,0 +1,206 @@
+//===== rAthena Script =======================================
+//= saders hunting quest
+//===== By: ==================================================
+//= Sader1992
+//https://rathena.org/board/profile/30766-sader1992/
+//===== Current Version: =====================================
+//= 5.0
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//https://rathena.org/board/files/file/3579-saders-hunting-quest/
+//https://github.com/sader1992/sader_scripts
+//===== Description: =========================================
+//============================================================
+//============================================================
+-	pointshop	Hunting_Quest_Shop	-1,#HUNT_Q_POINTS,512:1; //Account Based Shop
+//-	pointshop	Hunting_Quest_Shop	-1,HUNT_Q_POINTS,512:1; //Character Based Shop
+prontera,155,176,4	script	Hunting Quest	667,{
+	function Ac;
+	mes "Your Quest Progress:";
+	for(.@i=0;.@i<getarraysize(.CataName$);.@i++){
+		if(getd(Ac() + "COM_" + .@i)){
+			mes .CataName$[.@i] + ": Complete";
+			setd Ac() + "POINTS",getd(Ac() + "POINTS") + .CataRP[.@i];
+			if(.ExpServerRate){
+				getexp .CataBXP[.@i],.CataJXP[.@i];
+			}else{
+				getexp2 .CataBXP[.@i],.CataJXP[.@i];
+			}
+			if(getd(".IRD_" + .@i)){
+				for(.@i=0;.@i<getarraysize(getd(".IRD_" + .@i));.@i++){
+					getitem(getd(".IRD_" + .@i + "[" + .@i + "]"),getd(".CRD_" + .@i + "[" + .@i + "]"));
+				}
+			}
+			setd(Ac() + "CD_" + .@i,gettimetick(2) + (.CataCD[.@i] * 60 * 60));
+			setd(Ac() + "COM_" + .@i,false);
+			setd(Ac() + "ID_" + .@s1,0);
+			setd(Ac() + "C_" + .@s1,0);
+			setd(Ac() + "CC_" + .@s1,0);
+			continue;
+		}
+		.@CD = getd(Ac() + "CD_" + .@i);
+		if(.@CD > gettimetick(2)){
+			mes .CataName$[.@i] + ": " + gettimestr("%Y-%m/%d %H:%M:%S",21,.@CD);
+			continue;
+		}
+		if(getd(Ac() + "ID_" + .@i) == killedrid){
+			mes .CataName$[.@i] + "(" + getd(Ac() + "CC_" + .@i) + "/" + getd(Ac() + "C_" + .@i) + ") " + strmobinfo(1,getd(Ac() + "ID_" + .@i));
+			continue;
+		}
+		mes .CataName$[.@i] + ": None";
+	}
+	.@s1 = select("Open Shop:" + implode(.CataName$,":")) -2;
+	clear;
+	if(.@s1 == -1){
+		callshop "Hunting_Quest_Shop",1;
+		end;
+	}
+	.@CD = getd(Ac() + "CD_" + .@s1);
+	if(.@CD > gettimetick(2)){
+		mes "you are under the cooldown effect";
+		mes "try again after " + gettimestr("%Y-%m/%d %H:%M:%S",21,.@CD);
+		end;
+	}
+	if(getd(Ac() + "ID_" + .@s1)){
+		mes "Your Quest Progress:";
+		mes "(" + getd(Ac() + "CC_" + .@s1) + "/" + getd(Ac() + "C_" + .@s1) + ") " + strmobinfo(1,getd(Ac() + "ID_" + .@s1));
+		if(.AllowDeleteQuest){
+			mes "would you like to delete the quest?";
+			if(select("yes:no") == 2)
+				end;
+			mes "by deleting the quest you wont get any reward";
+			if(.ApplyCoolDownOnDelete) mes "and the cooldown will be applied!";
+			mes "Are you sure!?";
+			if(select("yes:no") == 2)
+				end;
+			clear;
+			if(.ApplyCoolDownOnDelete){
+				setd(Ac() + "CD_" + .@s1,gettimetick(2) + (.CataCD[.@s1] * 60 * 60));
+			}
+			setd(Ac() + "ID_" + .@s1,0);
+			setd(Ac() + "C_" + .@s1,0);
+			setd(Ac() + "CC_" + .@s1,0);
+			mes "your quest has been deleted!";
+			end;
+		}
+		end;
+	}
+	if(BaseLevel < .CataMN_L[.@s1] || BaseLevel > .CataMX_L[.@s1]){
+		mes "you need to be between level " + .CataMN_L[.@s1] + " And " + .CataMX_L[.@s1] + " to get this quest!";
+		end;
+	}
+	mes "would you like to get a quest?";
+	if(select("yes:no") == 2)
+		end;
+	copyarray(.@mid,getd(".m_id_" + .@s1),getarraysize(getd(".m_id_" + .@s1)));
+	.@r = rand(getarraysize(.@mid));
+	copyarray(.@mmn,getd(".m_mn_" + .@s1),getarraysize(getd(".m_mn_" + .@s1)));
+	copyarray(.@mmx,getd(".m_mx_" + .@s1),getarraysize(getd(".m_mx_" + .@s1)));
+	setd(Ac() + "ID_" + .@s1,.@mid[.@r]);
+	setd(Ac() + "C_" + .@s1,rand(getd(".m_mn_" + .@s1 + "[" + .@r + "]"),getd(".m_mx_" + .@s1 + "[" + .@r + "]")));
+	setd(Ac() + "CC_" + .@s1,0);
+	mes "Please Kill:";
+	mes "(" + getd(Ac() + "CC_" + .@s1) + "/" + getd(Ac() + "C_" + .@s1) + ") " + strmobinfo(1,getd(Ac() + "ID_" + .@s1));
+end;
+
+OnNPCKillEvent:
+	for(.@i=0;.@i<getarraysize(.CataName$);.@i++){
+		if(getd(Ac() + "ID_" + .@i) == killedrid && !getd(Ac() + "COM_" + .@i)){
+			setd(Ac() + "CC_" + .@i,getd(Ac() + "CC_" + .@i) + 1);
+			dispbottom "Hunting Quest [" + .CataName$[.@i] + "]: (" + getd(Ac() + "CC_" + .@i) + "/" + getd(Ac() + "C_" + .@i) + ") " + strmobinfo( 1,getd(Ac() + "ID_" + .@i));
+			if(getd(Ac() + "CC_" + .@i) >= getd(Ac() + "C_" + .@i)){
+				dispbottom "Your " + .CataName$[.@i] + " Hunting Quest is Done.";
+				setd(Ac() + "COM_" + .@i,true);
+			}
+		}
+	}
+end;
+
+OnHuntingCheck:
+	dispbottom "Your Hunting Quest Progress:";
+	for(.@i=0;.@i<getarraysize(.CataName$);.@i++){
+		if(getd(Ac() + "COM_" + .@i)){
+			dispbottom .CataName$[.@i] + ": Complete";
+			continue;
+		}
+		.@CD = getd(Ac() + "CD_" + .@i);
+		if(.@CD > gettimetick(2)){
+			dispbottom .CataName$[.@i] + ": " + gettimestr("%Y-%m/%d %H:%M:%S",21,.@CD);
+			continue;
+		}
+		if(getd(Ac() + "ID_" + .@i) == killedrid && !getd(Ac() + "COM_" + .@i)){
+			dispbottom .CataName$[.@i] + "(" + getd(Ac() + "CC_" + .@i) + "/" + getd(Ac() + "C_" + .@i) + ") " + strmobinfo(1,getd(Ac() + "ID_" + .@i));
+			continue;
+		}
+		dispbottom .CataName$[.@i] + ": None";
+	}
+end;
+
+	function	Ac	{
+		if(.AccountBase)
+			return "#HUNT_Q_";
+		return "HUNT_Q_";
+	}
+
+	function	AddCata	{
+		.@s = getarraysize(.CataName$);
+		set getarg(1),.@s;
+		.CataName$[.@s] = getarg(0);
+		.CataMN_L[.@s] = getarg(2);
+		.CataMX_L[.@s] = getarg(3);
+		.CataCD[.@s] = getarg(4);
+		.CataBXP[.@s] = getarg(5);
+		.CataJXP[.@s] = getarg(6);
+		.CataRP[.@s] = getarg(7);
+		for(.@i=8;.@i<getargcount();.@i+=2){
+			.@s2 = getarraysize(getd(".IRD_" + .@s));
+			setd ".IRD_" + .@s + "[" + .@s2 + "]",getarg(.@i);
+			setd ".CRD_" + .@s + "[" + .@s2 + "]",getarg(.@i+1);
+		}
+		return;
+	}
+
+	function	AddMob	{
+		.@s = getarraysize(getd(".m_id_" + getarg(0)));
+		setd ".m_id_" + getarg(0) + "[" + .@s + "]",getarg(1);
+		setd ".m_mn_" + getarg(0) + "[" + .@s + "]",getarg(2);
+		setd ".m_mx_" + getarg(0) + "[" + .@s + "]",getarg(3);
+		return;
+	}
+
+OnInit:
+	.AccountBase = true;//wither or not the quests are on account or on character
+	.ExpServerRate = false;//get exp according to the server rate?
+	.AllowDeleteQuest = true;//allow player to delete his quest without getting the reward
+	.ApplyCoolDownOnDelete = true;//wither or not apply cooldown on deleting the quest.
+	bindatcmd("MyQuest",strnpcinfo(3)+"::OnHuntingCheck",0,99);
+	freeloop(1);
+	//You can add as much categories as you want!
+	//recommended not more then 25!
+	//AddCata(<"name">,<.var>,<mini level>,<max level>,<cooldown in hours>,<base exp reward>,<job exp reward>,<point reward>,<ITEM ID>,<COUNT>{,<ITEM ID>,<COUNT>{,<ITEM ID>,<COUNT>}})
+	AddCata("Easy",.Easy,1,50,4,5000,250,50);
+	AddCata("Normal",.Normal,25,75,5,10000,1000,100);
+	AddCata("Hard",.Hard,50,80,6,25000,5000,150);
+	AddCata("Indeterminate",.Indeterminate,75,99,7,50000,10000,250);
+	
+	
+	//You can add as much mobs as you want!
+	//AddMob(<.var>,<mob id>,<min count>,<max count>);
+	AddMob(.Easy,1002,100,100);
+	AddMob(.Easy,1275,50,75);
+	AddMob(.Easy,1737,50,75);
+	
+	AddMob(.Normal,1002,150,150);
+	AddMob(.Normal,1275,75,100);
+	AddMob(.Normal,1737,75,100);
+	
+	AddMob(.Hard,1002,10,15);
+	AddMob(.Hard,1275,10,15);
+	AddMob(.Hard,1737,10,15);
+	
+	AddMob(.Indeterminate,1002,250,250);
+	AddMob(.Indeterminate,1275,125,150);
+	AddMob(.Indeterminate,1737,125,150);
+	
+end;
+}
